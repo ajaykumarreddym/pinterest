@@ -1,0 +1,102 @@
+name: pinterest
+description: "A pixel-perfect Pinterest clone built with Flutter."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # UI
+  cupertino_icons: ^1.0.8
+  flutter_screenutil: ^5.9.3
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+  flutter_staggered_grid_view: ^0.7.0
+  flutter_svg: ^2.0.17
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigation
+  go_router: ^14.8.1
+
+  # Networking
+  dio: ^5.7.0
+
+  # Authentication
+  clerk_flutter: ^0.0.14-beta
+  clerk_auth: ^0.0.14-beta
+
+  # Serialization
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Functional Programming
+  dartz: ^0.10.1
+
+  # Local Storage
+  equatable: ^2.0.7
+  flutter_secure_storage: ^9.2.4
+  shared_preferences: ^2.3.4
+
+  # Environment
+  flutter_dotenv: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  # Code Generation
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.6.3
+
+  # Testing
+  mocktail: ^1.0.4
+  change_app_package_name: ^1.5.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon_ios.png"
+  image_path_ios: "assets/images/app_icon_ios.png"
+  image_path_android: "assets/images/app_icon.png"
+  adaptive_icon_background: "#E60023"
+  adaptive_icon_foreground: "assets/images/app_icon_android_fg.png"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  web:
+    generate: true
+    image_path: "assets/images/app_icon_ios.png"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - .env
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+    - assets/lang/
+
+  fonts:
+    - family: Pinterest
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700

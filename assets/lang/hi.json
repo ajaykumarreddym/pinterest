@@ -1,0 +1,141 @@
+{
+  "general": {
+    "ok": "ठीक है",
+    "cancel": "रद्द करें",
+    "confirm": "पुष्टि करें",
+    "save": "सहेजें",
+    "saved": "सहेजा गया",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "close": "बंद करें",
+    "back": "वापस",
+    "next": "आगे",
+    "done": "हो गया",
+    "skip": "छोड़ें",
+    "retry": "पुनः प्रयास",
+    "submit": "जमा करें",
+    "search": "खोजें",
+    "share": "साझा करें",
+    "follow": "फ़ॉलो करें",
+    "visit": "देखें",
+    "loading": "लोड हो रहा है...",
+    "downloading": "डाउनलोड हो रहा है...",
+    "pleaseWait": "कृपया प्रतीक्षा करें...",
+    "continue": "जारी रखें",
+    "loadMore": "और लोड करें",
+    "copy": "कॉपी करें",
+    "copied": "कॉपी हो गया!",
+    "undo": "पूर्ववत करें",
+    "clear": "साफ़ करें",
+    "or": "या",
+    "readMore": "और पढ़ें",
+    "readLess": "कम पढ़ें",
+    "error": "त्रुटि",
+    "exit": "बाहर निकलें"
+  },
+  "errors": {
+    "somethingWentWrong": "कुछ गलत हो गया",
+    "noInternetConnection": "इंटरनेट कनेक्शन नहीं है",
+    "failedToLoadPin": "पिन लोड करने में विफल",
+    "pinNotFound": "पिन नहीं मिला",
+    "noCachedPhotos": "कोई कैश्ड फ़ोटो नहीं मिली"
+  },
+  "nav": {
+    "home": "होम",
+    "search": "खोजें",
+    "create": "बनाएं",
+    "messages": "संदेश",
+    "profile": "प्रोफ़ाइल"
+  },
+  "home": {
+    "all": "सभी",
+    "forYou": "आपके लिए"
+  },
+  "auth": {
+    "onboardingTagline": "अपनी पसंद की\nज़िंदगी बनाएं",
+    "emailAddress": "ईमेल पता",
+    "password": "पासवर्ड",
+    "logIn": "लॉग इन",
+    "signUp": "साइन अप",
+    "continueWithGoogle": "Google से जारी रखें",
+    "continueWithApple": "Apple से जारी रखें",
+    "continueAsUser": "उपयोगकर्ता के रूप में जारी रखें",
+    "email": "ईमेल",
+    "enterYourEmail": "अपना ईमेल दर्ज करें",
+    "enterYourPassword": "अपना पासवर्ड दर्ज करें",
+    "forgottenPassword": "पासवर्ड भूल गए?",
+    "emailAlreadyRegistered": "यह ईमेल पहले से पंजीकृत है। कृपया लॉग इन करें।",
+    "facebookNotice": "Facebook लॉगिन अब उपलब्ध नहीं है।",
+    "recoverAccount": "अपना खाता पुनर्प्राप्त करें।",
+    "useiCloudKeychain": "iCloud Keychain का उपयोग करें",
+    "createYourAccount": "अपना खाता बनाएं",
+    "alreadyHaveAccount": "पहले से खाता है?",
+    "dontHaveAccount": "खाता नहीं है?",
+    "agreeToTerms": "जारी रखकर, आप Pinterest की सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं",
+    "verifyYourEmail": "अपना ईमेल सत्यापित करें",
+    "verificationCodeSent": "हमने एक सत्यापन कोड भेजा है",
+    "enterCode": "कोड दर्ज करें",
+    "verify": "सत्यापित करें",
+    "resendCode": "कोड फिर से भेजें",
+    "verificationCodeResent": "सत्यापन कोड सफलतापूर्वक भेजा गया",
+    "verificationFailed": "सत्यापन विफल। कृपया पुनः प्रयास करें।",
+    "didntReceiveCode": "कोड नहीं मिला?",
+    "resetPassword": "पासवर्ड रीसेट करें",
+    "resetPasswordDescription": "अपना ईमेल दर्ज करें और हम आपको पासवर्ड रीसेट करने के लिए एक कोड भेजेंगे।",
+    "sendResetCode": "रीसेट कोड भेजें",
+    "resetCodeSent": "रीसेट कोड आपके ईमेल पर भेजा गया",
+    "enterResetCode": "अपने ईमेल से कोड दर्ज करें",
+    "newPassword": "नया पासवर्ड",
+    "enterNewPassword": "अपना नया पासवर्ड दर्ज करें",
+    "confirmNewPassword": "नए पासवर्ड की पुष्टि करें",
+    "passwordResetSuccess": "पासवर्ड सफलतापूर्वक रीसेट हो गया! आप अब साइन इन हैं।",
+    "passwordResetFailed": "पासवर्ड रीसेट विफल। कृपया पुनः प्रयास करें।",
+    "useClerkSignIn": "Clerk से साइन इन करें",
+    "whatsYourEmail": "आपका ईमेल क्या है?",
+    "enterYourEmailAddress": "अपना ईमेल पता दर्ज करें"
+  },
+  "search": {
+    "searchForIdeas": "विचार खोजें",
+    "ideasForYou": "आपके लिए विचार",
+    "moreToExplore": "और खोजें",
+    "noResultsFor": "कोई परिणाम नहीं"
+  },
+  "categories": {
+    "wallpapers": "वॉलपेपर",
+    "nature": "प्रकृति",
+    "architecture": "वास्तुकला",
+    "travel": "यात्रा",
+    "fashion": "फैशन",
+    "food": "भोजन",
+    "animals": "जानवर",
+    "art": "कला"
+  },
+  "pinDetail": {
+    "moreLikeThis": "ऐसे और भी"
+  },
+  "pinActions": {
+    "downloadImage": "चित्र डाउनलोड करें",
+    "copyLink": "लिंक कॉपी करें",
+    "share": "साझा करें",
+    "hidePin": "पिन छुपाएं",
+    "reportPin": "पिन की रिपोर्ट करें"
+  },
+  "profile": {
+    "pins": "पिन",
+    "boards": "बोर्ड",
+    "collages": "कोलाज",
+    "favourites": "पसंदीदा",
+    "createdByYou": "आपके द्वारा बनाए गए",
+    "noBoardsYet": "अभी कोई बोर्ड नहीं",
+    "noCollagesYet": "अभी कोई कोलाज नहीं",
+    "pinsSaved": "{count} पिन सहेजे गए"
+  },
+  "create": {
+    "title": "बनाएं",
+    "subtitle": "पिन या कोलाज बनाएं"
+  },
+  "messages": {
+    "title": "संदेश",
+    "subtitle": "दोस्तों के साथ विचार साझा करें"
+  }
+}

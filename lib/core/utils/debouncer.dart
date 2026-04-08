@@ -1,0 +1,19 @@
+import 'dart:async';
+
+/// Debounces rapid function calls (e.g., search-as-you-type).
+class Debouncer {
+  Debouncer({required this.duration});
+
+  final Duration duration;
+  Timer? _timer;
+
+  void call(void Function() action) {
+    _timer?.cancel();
+    _timer = Timer(duration, action);
+  }
+
+  void dispose() {
+    _timer?.cancel();
+    _timer = null;
+  }
+}

@@ -1,0 +1,198 @@
+/// Default English locale strings used as fallback when no cached data exists.
+/// This ensures the app works even on first launch before any language is fetched.
+///
+/// **Important**: Keep this in sync with assets/lang/en.json
+class DefaultLocaleStrings {
+  DefaultLocaleStrings._();
+
+  /// Default English strings map
+  static const Map<String, dynamic> english = {
+    'general': {
+      'ok': 'OK',
+      'cancel': 'Cancel',
+      'confirm': 'Confirm',
+      'save': 'Save',
+      'saved': 'Saved',
+      'delete': 'Delete',
+      'edit': 'Edit',
+      'close': 'Close',
+      'back': 'Back',
+      'next': 'Next',
+      'done': 'Done',
+      'skip': 'Skip',
+      'retry': 'Retry',
+      'submit': 'Submit',
+      'search': 'Search',
+      'share': 'Share',
+      'follow': 'Follow',
+      'visit': 'Visit',
+      'loading': 'Loading...',
+      'downloading': 'Downloading...',
+      'pleaseWait': 'Please wait...',
+      'continue': 'Continue',
+      'loadMore': 'Load More',
+      'copy': 'Copy',
+      'copied': 'Copied!',
+      'undo': 'Undo',
+      'clear': 'Clear',
+      'or': 'Or',
+      'readMore': 'Read more',
+      'readLess': 'Read less',
+      'error': 'Error',
+      'exit': 'Exit',
+    },
+    'errors': {
+      'somethingWentWrong': 'Something went wrong',
+      'noInternetConnection': 'No internet connection',
+      'failedToLoadPin': 'Failed to load pin',
+      'pinNotFound': 'Pin not found',
+      'noCachedPhotos': 'No cached photos found',
+    },
+    'nav': {
+      'home': 'Home',
+      'search': 'Search',
+      'create': 'Create',
+      'messages': 'Messages',
+      'profile': 'Profile',
+    },
+    'home': {
+      'all': 'All',
+      'forYou': 'For you',
+    },
+    'auth': {
+      'onboardingTagline': 'Create a life\nyou love',
+      'emailAddress': 'Email address',
+      'password': 'Password',
+      'logIn': 'Log in',
+      'signUp': 'Sign up',
+      'continueWithGoogle': 'Continue with Google',
+      'continueWithApple': 'Continue with Apple',
+      'continueAsUser': 'Continue as User',
+      'email': 'Email',
+      'enterYourEmail': 'Enter your email',
+      'enterYourPassword': 'Enter your password',
+      'forgottenPassword': 'Forgotten your password?',
+      'emailAlreadyRegistered':
+          'This email is already registered. Please log in instead.',
+      'facebookNotice': 'Facebook login is no longer available.',
+      'recoverAccount': 'Recover your account.',
+      'useiCloudKeychain': 'Use iCloud Keychain',
+      'createYourAccount': 'Create your account',
+      'alreadyHaveAccount': 'Already have an account?',
+      'dontHaveAccount': "Don't have an account?",
+      'agreeToTerms': "By continuing, you agree to Pinterest's Terms of Service and Privacy Policy",
+      'verifyYourEmail': 'Verify your email',
+      'verificationCodeSent': 'We sent a verification code to',
+      'enterCode': 'Enter code',
+      'verify': 'Verify',
+      'resendCode': 'Resend code',
+      'verificationCodeResent': 'Verification code resent successfully',
+      'verificationFailed': 'Verification failed. Please try again.',
+      'didntReceiveCode': "Didn't receive a code?",
+      'resetPassword': 'Reset password',
+      'resetPasswordDescription': "Enter your email and we'll send you a code to reset your password.",
+      'sendResetCode': 'Send reset code',
+      'resetCodeSent': 'Reset code sent to your email',
+      'enterResetCode': 'Enter the code from your email',
+      'newPassword': 'New password',
+      'enterNewPassword': 'Enter your new password',
+      'confirmNewPassword': 'Confirm new password',
+      'passwordResetSuccess': 'Password reset successfully! You are now signed in.',
+      'passwordResetFailed': 'Password reset failed. Please try again.',
+      'useClerkSignIn': 'Sign in with Clerk',
+      'whatsYourEmail': "What's your email?",
+      'enterYourEmailAddress': 'Enter your email address',
+      'createAPassword': 'Create a password',
+      'createAStrongPassword': 'Create a strong password',
+      'passwordRequirement': 'Use 8 or more letters, numbers and symbols',
+      'passwordTips': 'Password tips',
+      'passwordTipsBody': 'A strong password helps keep your account safe. Use at least 8 letters, numbers and symbols.',
+      'whatToAvoid': 'What to avoid',
+      'avoidCommonPasswords': 'Common passwords, words and names',
+      'avoidRecentDates': 'Recent dates or dates associated with you',
+      'avoidSimplePatterns': 'Simple patterns and repeated text',
+      'strengthWeak': 'Weak',
+      'strengthFair': 'Fair',
+      'strengthGood': 'Good',
+      'strengthStrong': 'Strong',
+      'strengthPerfection': 'Perfection!',
+      'enterYourBirthdate': 'Enter your birthdate',
+      'enterYourNameHere': 'Enter your name here',
+      'birthdateInfoTitle': "Knowing your age helps keep Pinterest safe for everyone. It won't be visible to others.",
+      'birthdateInfoSubtitle': 'Use your own birthdate, even if this is a business account.',
+      'whatIsYourGender': 'What is your gender?',
+      'genderSubtitle': "This helps us find you more relevant content. We won't show it on your profile.",
+      'female': 'Female',
+      'male': 'Male',
+      'specifyAnotherGender': 'Specify another gender',
+      'heyName': 'Hey {name}',
+      'set': 'Set',
+      'updateName': 'Update',
+      'whatsYourCountry': 'What is your country or region?',
+      'countrySubtitle':
+          "This helps us find you more relevant content. We won't show it on your profile.",
+      'whatAreYouInTheMood': 'What are you in the mood to do?',
+      'pickTopicsSubtitle': 'Pick 3 or more to curate your experience',
+      'greatPicks': 'Great picks!',
+    },
+    'search': {
+      'searchForIdeas': 'Search for ideas',
+      'ideasForYou': 'Ideas for you',
+      'moreToExplore': 'More to explore',
+      'noResultsFor': 'No results for',
+    },
+    'categories': {
+      'wallpapers': 'Wallpapers',
+      'nature': 'Nature',
+      'architecture': 'Architecture',
+      'travel': 'Travel',
+      'fashion': 'Fashion',
+      'food': 'Food',
+      'animals': 'Animals',
+      'art': 'Art',
+    },
+    'pinDetail': {
+      'moreLikeThis': 'More like this',
+    },
+    'pinActions': {
+      'downloadImage': 'Download image',
+      'copyLink': 'Copy link',
+      'share': 'Share',
+      'hidePin': 'Hide Pin',
+      'reportPin': 'Report Pin',
+    },
+    'profile': {
+      'pins': 'Pins',
+      'boards': 'Boards',
+      'collages': 'Collages',
+      'favourites': 'Favourites',
+      'createdByYou': 'Created by you',
+      'noBoardsYet': 'No boards yet',
+      'noCollagesYet': 'No collages yet',
+    },
+    'create': {
+      'title': 'Create',
+      'subtitle': 'Create a Pin or Collage',
+    },
+    'messages': {
+      'title': 'Messages',
+      'subtitle': 'Share ideas with friends',
+    },
+  };
+
+  // ─── Convenience accessors ────────────────────────────────────
+
+  /// Get a string from the default locale map by section and key.
+  static String get(String section, String key) {
+    final sectionMap = english[section] as Map<String, dynamic>?;
+    return sectionMap?[key]?.toString() ?? key;
+  }
+
+  /// Returns "No results for 'query'"
+  static String noResultsFor(String query) =>
+      '${get('search', 'noResultsFor')} "$query"';
+
+  /// Returns "{count} Pins saved"
+  static String pinsSaved(int count) => '$count ${get('profile', 'pins')} saved';
+}
+

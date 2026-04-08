@@ -1,0 +1,194 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "📦 Create New Feature",
+      "type": "shell",
+      "command": "FEATURE=\"${input:feature_name}\" && echo \"📦 Creating feature: $FEATURE...\" && mkdir -p \"./lib/features/$FEATURE/presentation/bloc\" && mkdir -p \"./lib/features/$FEATURE/presentation/views\" && mkdir -p \"./lib/features/$FEATURE/presentation/widgets\" && touch \"./lib/features/$FEATURE/presentation/views/${FEATURE}_screen.dart\" && touch \"./lib/features/$FEATURE/presentation/bloc/${FEATURE}_bloc.dart\" && touch \"./lib/features/$FEATURE/presentation/bloc/${FEATURE}_event.dart\" && touch \"./lib/features/$FEATURE/presentation/bloc/${FEATURE}_state.dart\" && mkdir -p \"./lib/features/$FEATURE/data/datasources\" && mkdir -p \"./lib/features/$FEATURE/data/models\" && mkdir -p \"./lib/features/$FEATURE/data/repositories\" && touch \"./lib/features/$FEATURE/data/datasources/${FEATURE}_remote_datasource.dart\" && touch \"./lib/features/$FEATURE/data/datasources/${FEATURE}_local_datasource.dart\" && touch \"./lib/features/$FEATURE/data/models/${FEATURE}_model.dart\" && touch \"./lib/features/$FEATURE/data/repositories/${FEATURE}_repository_impl.dart\" && mkdir -p \"./lib/features/$FEATURE/domain/entities\" && mkdir -p \"./lib/features/$FEATURE/domain/repositories\" && mkdir -p \"./lib/features/$FEATURE/domain/usecases\" && touch \"./lib/features/$FEATURE/domain/entities/${FEATURE}.dart\" && touch \"./lib/features/$FEATURE/domain/repositories/${FEATURE}_repository.dart\" && touch \"./lib/features/$FEATURE/domain/usecases/get_${FEATURE}_usecase.dart\" && mkdir -p \"./lib/features/$FEATURE/docs/generatedSummaryMDFileByAi\" && touch \"./lib/features/$FEATURE/docs/README.md\" && touch \"./lib/features/$FEATURE/docs/generatedSummaryMDFileByAi/AiSummary.md\" && mkdir -p \"./test/features/$FEATURE\" && echo \"\" && echo \"✅ Feature '$FEATURE' created successfully!\" && echo \"\" && echo \"📁 Structure created:\" && echo \"  ├── domain/\" && echo \"  │   ├── entities/${FEATURE}.dart\" && echo \"  │   ├── repositories/${FEATURE}_repository.dart\" && echo \"  │   └── usecases/get_${FEATURE}_usecase.dart\" && echo \"  ├── data/\" && echo \"  │   ├── datasources/${FEATURE}_remote_datasource.dart\" && echo \"  │   ├── datasources/${FEATURE}_local_datasource.dart\" && echo \"  │   ├── models/${FEATURE}_model.dart\" && echo \"  │   └── repositories/${FEATURE}_repository_impl.dart\" && echo \"  ├── presentation/\" && echo \"  │   ├── bloc/${FEATURE}_bloc.dart\" && echo \"  │   ├── views/${FEATURE}_screen.dart\" && echo \"  │   └── widgets/\" && echo \"  └── docs/\" && echo \"      ├── README.md\" && echo \"      └── generatedSummaryMDFileByAi/\" && echo \"          └── AiSummary.md\" && echo \"\" && echo \"🎯 Next steps:\" && echo \"  1. Implement Domain layer (entities, repositories, usecases)\" && echo \"  2. Implement Data layer (models, datasources, repository impl)\" && echo \"  3. Implement Presentation layer (BLoC, views, widgets)\" && echo \"  4. Document feature in docs/README.md\" && echo \"  5. Update AI summary in docs/generatedSummaryMDFileByAi/AiSummary.md\" && echo \"  6. Run: dart run build_runner build\"",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🧪 Create Feature Tests",
+      "type": "shell",
+      "command": "FEATURE=\"${input:feature_name}\" && echo \"🧪 Creating test structure for: $FEATURE...\" && mkdir -p \"./test/features/$FEATURE/presentation/bloc\" && mkdir -p \"./test/features/$FEATURE/presentation/views\" && mkdir -p \"./test/features/$FEATURE/data/datasources\" && mkdir -p \"./test/features/$FEATURE/data/repositories\" && mkdir -p \"./test/features/$FEATURE/domain/usecases\" && touch \"./test/features/$FEATURE/presentation/bloc/${FEATURE}_bloc_test.dart\" && touch \"./test/features/$FEATURE/presentation/views/${FEATURE}_screen_test.dart\" && touch \"./test/features/$FEATURE/data/datasources/${FEATURE}_remote_datasource_test.dart\" && touch \"./test/features/$FEATURE/data/repositories/${FEATURE}_repository_impl_test.dart\" && touch \"./test/features/$FEATURE/domain/usecases/get_${FEATURE}_usecase_test.dart\" && echo \"✅ Test structure created for '$FEATURE'!\"",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "📦 Create Feature + Tests",
+      "dependsOn": ["📦 Create New Feature", "🧪 Create Feature Tests"],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "📋 Validate Feature Structure",
+      "type": "shell",
+      "command": "FEATURE=\"${input:feature_name}\" && echo \"📋 Validating feature: $FEATURE...\" && if [ -d \"./lib/features/$FEATURE/data\" ] && [ -d \"./lib/features/$FEATURE/domain\" ] && [ -d \"./lib/features/$FEATURE/presentation\" ]; then echo \"✅ Structure is valid!\"; ls -R \"./lib/features/$FEATURE\"; else echo \"❌ Invalid structure - missing required folders\"; fi",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🧹 Flutter Clean & Get",
+      "type": "shell",
+      "command": "echo '🧹 Cleaning Flutter project...' && flutter clean && echo '📦 Getting dependencies...' && flutter pub get && echo '✅ Done!'",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🔄 Build Runner (Build)",
+      "type": "shell",
+      "command": "echo '🔄 Running build_runner...' && dart run build_runner build --delete-conflicting-outputs && echo '✅ Build complete!'",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "👁️ Build Runner (Watch)",
+      "type": "shell",
+      "command": "echo '👁️ Starting build_runner in watch mode...' && dart run build_runner watch --delete-conflicting-outputs",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "isBackground": true
+    },
+    {
+      "label": "🚀 Quick Start (Clean + Build)",
+      "dependsOn": ["🧹 Flutter Clean & Get", "🔄 Build Runner (Build)"],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🧪 Run Tests",
+      "type": "shell",
+      "command": "echo '🧪 Running tests...' && flutter test && echo '✅ Tests complete!'",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🧪 Run Feature Tests",
+      "type": "shell",
+      "command": "FEATURE=\"${input:feature_name}\" && echo \"🧪 Running tests for: $FEATURE...\" && flutter test test/features/$FEATURE && echo '✅ Tests complete!'",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "🔧 Create Core Service",
+      "type": "shell",
+      "command": "SERVICE=\"${input:service_name}\" && echo \"🔧 Creating core service: $SERVICE...\" && mkdir -p \"./lib/core/services/$SERVICE\" && touch \"./lib/core/services/$SERVICE/${SERVICE}_service.dart\" && echo \"✅ Service created at lib/core/services/$SERVICE/\"",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    },
+    {
+      "label": "📝 Create Code Snippet",
+      "type": "shell",
+      "command": "SNIPPET=\"${input:snippet_name}\" && mkdir -p .vscode && touch \"./.vscode/$SNIPPET.code-snippets\" && echo \"✅ Snippet file created at .vscode/$SNIPPET.code-snippets\"",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "feature_name",
+      "description": "Enter feature name (snake_case, e.g., user_profile)",
+      "default": "my_feature"
+    },
+    {
+      "type": "promptString",
+      "id": "service_name",
+      "description": "Enter service name (snake_case, e.g., auth_service)",
+      "default": "my_service"
+    },
+    {
+      "type": "promptString",
+      "id": "snippet_name",
+      "description": "Enter snippet file name (e.g., flutter_snippets)",
+      "default": "my_snippets"
+    }
+  ]
+}

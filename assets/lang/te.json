@@ -1,0 +1,141 @@
+{
+  "general": {
+    "ok": "సరే",
+    "cancel": "రద్దు చేయి",
+    "confirm": "నిర్ధారించు",
+    "save": "సేవ్ చేయి",
+    "saved": "సేవ్ చేయబడింది",
+    "delete": "తొలగించు",
+    "edit": "సవరించు",
+    "close": "మూసివేయి",
+    "back": "వెనుకకు",
+    "next": "తదుపరి",
+    "done": "పూర్తయింది",
+    "skip": "దాటవేయి",
+    "retry": "మళ్ళీ ప్రయత్నించు",
+    "submit": "సబ్మిట్ చేయి",
+    "search": "వెతుకు",
+    "share": "షేర్ చేయి",
+    "follow": "ఫాలో చేయి",
+    "visit": "చూడు",
+    "loading": "లోడ్ అవుతోంది...",
+    "downloading": "డౌన్‌లోడ్ అవుతోంది...",
+    "pleaseWait": "దయచేసి వేచి ఉండండి...",
+    "continue": "కొనసాగించు",
+    "loadMore": "ఇంకా లోడ్ చేయి",
+    "copy": "కాపీ చేయి",
+    "copied": "కాపీ చేయబడింది!",
+    "undo": "రద్దు చేయి",
+    "clear": "క్లియర్ చేయి",
+    "or": "లేదా",
+    "readMore": "ఇంకా చదువు",
+    "readLess": "తక్కువ చదువు",
+    "error": "లోపం",
+    "exit": "నిష్క్రమించు"
+  },
+  "errors": {
+    "somethingWentWrong": "ఏదో తప్పు జరిగింది",
+    "noInternetConnection": "ఇంటర్నెట్ కనెక్షన్ లేదు",
+    "failedToLoadPin": "పిన్ లోడ్ చేయడంలో విఫలమైంది",
+    "pinNotFound": "పిన్ కనుగొనబడలేదు",
+    "noCachedPhotos": "క్యాష్ చేసిన ఫోటోలు కనుగొనబడలేదు"
+  },
+  "nav": {
+    "home": "హోమ్",
+    "search": "వెతుకు",
+    "create": "సృష్టించు",
+    "messages": "సందేశాలు",
+    "profile": "ప్రొఫైల్"
+  },
+  "home": {
+    "all": "అన్నీ",
+    "forYou": "మీ కోసం"
+  },
+  "auth": {
+    "onboardingTagline": "మీకు నచ్చిన\nజీవితాన్ని సృష్టించండి",
+    "emailAddress": "ఇమెయిల్ చిరునామా",
+    "password": "పాస్‌వర్డ్",
+    "logIn": "లాగిన్",
+    "signUp": "సైన్ అప్",
+    "continueWithGoogle": "Google తో కొనసాగించు",
+    "continueWithApple": "Apple తో కొనసాగించు",
+    "continueAsUser": "యూజర్‌గా కొనసాగించు",
+    "email": "ఇమెయిల్",
+    "enterYourEmail": "మీ ఇమెయిల్ నమోదు చేయండి",
+    "enterYourPassword": "మీ పాస్‌వర్డ్ నమోదు చేయండి",
+    "forgottenPassword": "పాస్‌వర్డ్ మర్చిపోయారా?",
+    "emailAlreadyRegistered": "ఈ ఇమెయిల్ ఇప్పటికే నమోదు చేయబడింది. దయచేసి లాగిన్ చేయండి.",
+    "facebookNotice": "Facebook లాగిన్ ఇకపై అందుబాటులో లేదు.",
+    "recoverAccount": "మీ ఖాతాను పునరుద్ధరించండి.",
+    "useiCloudKeychain": "iCloud Keychain ఉపయోగించండి",
+    "createYourAccount": "మీ ఖాతాను సృష్టించండి",
+    "alreadyHaveAccount": "ఇప్పటికే ఖాతా ఉందా?",
+    "dontHaveAccount": "ఖాతా లేదా?",
+    "agreeToTerms": "కొనసాగించడం ద్వారా, మీరు Pinterest సేవా నిబంధనలు మరియు గోప్యతా విధానాన్ని అంగీకరిస్తున్నారు",
+    "verifyYourEmail": "మీ ఈమెయిల్ను ధృవీకరించండి",
+    "verificationCodeSent": "మేము ధృవీకరణ కోడ్ను పంపాము",
+    "enterCode": "కోడ్ నమోదు చేయండి",
+    "verify": "ధృవీకరించండి",
+    "resendCode": "కోడ్ మళ్ళీ పంపండి",
+    "verificationCodeResent": "ధృవీకరణ కోడ్ విజయవంతంగా పంపబడింది",
+    "verificationFailed": "ధృవీకరణ విఫలమైంది. దయచేసి మళ్ళీ ప్రయత్నించండి.",
+    "didntReceiveCode": "కోడ్ రాలేదా?",
+    "resetPassword": "పాస్‌వర్డ్ రీసెట్ చేయండి",
+    "resetPasswordDescription": "మీ ఇమెయిల్ నమోదు చేయండి, మీ పాస్‌వర్డ్ రీసెట్ చేయడానికి మేము కోడ్ పంపుతాము.",
+    "sendResetCode": "రీసెట్ కోడ్ పంపండి",
+    "resetCodeSent": "రీసెట్ కోడ్ మీ ఇమెయిల్‌కు పంపబడింది",
+    "enterResetCode": "మీ ఇమెయిల్ నుండి కోడ్ నమోదు చేయండి",
+    "newPassword": "కొత్త పాస్‌వర్డ్",
+    "enterNewPassword": "మీ కొత్త పాస్‌వర్డ్ నమోదు చేయండి",
+    "confirmNewPassword": "కొత్త పాస్‌వర్డ్ నిర్ధారించండి",
+    "passwordResetSuccess": "పాస్‌వర్డ్ విజయవంతంగా రీసెట్ చేయబడింది! మీరు ఇప్పుడు సైన్ ఇన్ చేసారు.",
+    "passwordResetFailed": "పాస్‌వర్డ్ రీసెట్ విఫలమైంది. దయచేసి మళ్ళీ ప్రయత్నించండి.",
+    "useClerkSignIn": "Clerk తో సైన్ ఇన్ చేయండి",
+    "whatsYourEmail": "మీ ఇమెయిల్ ఏమిటి?",
+    "enterYourEmailAddress": "మీ ఇమెయిల్ చిరునామాను నమోదు చేయండి"
+  },
+  "search": {
+    "searchForIdeas": "ఆలోచనలు వెతకండి",
+    "ideasForYou": "మీ కోసం ఆలోచనలు",
+    "moreToExplore": "ఇంకా చూడండి",
+    "noResultsFor": "ఫలితాలు లేవు"
+  },
+  "categories": {
+    "wallpapers": "వాల్‌పేపర్లు",
+    "nature": "ప్రకృతి",
+    "architecture": "వాస్తుశిల్పం",
+    "travel": "ప్రయాణం",
+    "fashion": "ఫ్యాషన్",
+    "food": "ఆహారం",
+    "animals": "జంతువులు",
+    "art": "కళ"
+  },
+  "pinDetail": {
+    "moreLikeThis": "ఇలాంటివి ఇంకా"
+  },
+  "pinActions": {
+    "downloadImage": "చిత్రాన్ని డౌన్‌లోడ్ చేయి",
+    "copyLink": "లింక్ కాపీ చేయి",
+    "share": "షేర్ చేయి",
+    "hidePin": "పిన్ దాచు",
+    "reportPin": "పిన్ రిపోర్ట్ చేయి"
+  },
+  "profile": {
+    "pins": "పిన్‌లు",
+    "boards": "బోర్డులు",
+    "collages": "కొలాజ్‌లు",
+    "favourites": "ఫేవరిట్‌లు",
+    "createdByYou": "మీరు సృష్టించినవి",
+    "noBoardsYet": "ఇంకా బోర్డులు లేవు",
+    "noCollagesYet": "ఇంకా కొలాజ్‌లు లేవు",
+    "pinsSaved": "{count} పిన్‌లు సేవ్ చేయబడ్డాయి"
+  },
+  "create": {
+    "title": "సృష్టించు",
+    "subtitle": "పిన్ లేదా కొలాజ్ సృష్టించు"
+  },
+  "messages": {
+    "title": "సందేశాలు",
+    "subtitle": "స్నేహితులతో ఆలోచనలు షేర్ చేయండి"
+  }
+}
