@@ -9,6 +9,7 @@ import 'package:pinterest/core/design_systems/colors/app_colors.dart';
 import 'package:pinterest/core/design_systems/typography/app_typography.dart';
 import 'package:pinterest/core/ui/atoms/app_social_button.dart';
 import 'package:pinterest/core/ui/atoms/app_text_field.dart';
+import 'package:pinterest/core/ui/atoms/app_toast.dart';
 import 'package:pinterest/core/utils/validators/validators.dart';
 import 'package:pinterest/features/auth/presentation/providers/auth_providers.dart';
 import 'package:pinterest/features/auth/presentation/widgets/forgot_password_bottom_sheet.dart';
@@ -84,11 +85,17 @@ class _LoginBottomSheetContentState
   Future<void> _handleLogin() async {
     if (!_isFormValid) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    await ref.read(authProvider.notifier).login(
-          context: context,
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+    try {
+      await ref.read(authProvider.notifier).login(
+            context: context,
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+    } catch (e) {
+      if (mounted) {
+        AppToast.error(context, message: e.toString());
+      }
+    }
   }
 
   @override

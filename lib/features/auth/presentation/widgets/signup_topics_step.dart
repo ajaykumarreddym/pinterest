@@ -10,73 +10,131 @@ import 'package:pinterest/features/localization/presentation/extensions/localiza
 
 /// A topic/interest item for the picker grid.
 class TopicItem {
-  const TopicItem({required this.label, required this.imageUrl});
+  const TopicItem({
+    required this.label,
+    required this.imageUrl,
+    required this.category,
+  });
 
+  /// Display label shown below the image.
   final String label;
+
+  /// Image URL for the card thumbnail.
   final String imageUrl;
+
+  /// Pexels search keyword used for the "For you" feed.
+  final String category;
 }
 
 /// Hard-coded topics matching the Pinterest signup screen.
-const _kTopics = [
+const kTopics = [
   TopicItem(
     label: 'Cute greetings',
+    category: 'greeting cards',
     imageUrl:
         'https://images.pexels.com/photos/1643456/pexels-photo-1643456.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Photography',
+    category: 'photography',
     imageUrl:
         'https://images.pexels.com/photos/1983037/pexels-photo-1983037.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Cute animals',
+    category: 'cute animals',
     imageUrl:
         'https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Small spaces',
+    category: 'small spaces interior',
     imageUrl:
         'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Plants',
+    category: 'plants',
     imageUrl:
         'https://images.pexels.com/photos/1084199/pexels-photo-1084199.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Home renovation',
+    category: 'home renovation',
     imageUrl:
         'https://images.pexels.com/photos/1457842/pexels-photo-1457842.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Classroom ideas',
+    category: 'classroom education',
     imageUrl:
         'https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Hair inspiration',
+    category: 'hairstyle',
     imageUrl:
         'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Cars',
+    category: 'cars',
     imageUrl:
         'https://images.pexels.com/photos/3752169/pexels-photo-3752169.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'DIY projects',
+    category: 'diy crafts',
     imageUrl:
         'https://images.pexels.com/photos/1109197/pexels-photo-1109197.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Anime and comics',
+    category: 'anime',
     imageUrl:
         'https://images.pexels.com/photos/2832382/pexels-photo-2832382.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
   TopicItem(
     label: 'Home décor',
+    category: 'home decor',
     imageUrl:
         'https://images.pexels.com/photos/1648776/pexels-photo-1648776.jpeg?auto=compress&cs=tinysrgb&w=400',
+  ),
+  TopicItem(
+    label: 'Relaxation',
+    category: 'relaxation spa',
+    imageUrl:
+        'https://images.pexels.com/photos/3188/love-romantic-bath-candlelight.jpg?auto=compress&cs=tinysrgb&w=400',
+  ),
+  TopicItem(
+    label: 'Trainers',
+    category: 'sneakers shoes',
+    imageUrl:
+        'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
+  ),
+  TopicItem(
+    label: 'Nail trends',
+    category: 'nail art',
+    imageUrl:
+        'https://images.pexels.com/photos/3997391/pexels-photo-3997391.jpeg?auto=compress&cs=tinysrgb&w=400',
+  ),
+  TopicItem(
+    label: 'Outfit ideas',
+    category: 'outfit fashion',
+    imageUrl:
+        'https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=400',
+  ),
+  TopicItem(
+    label: 'Cooking',
+    category: 'cooking food',
+    imageUrl:
+        'https://images.pexels.com/photos/1640774/pexels-photo-1640774.jpeg?auto=compress&cs=tinysrgb&w=400',
+  ),
+  TopicItem(
+    label: 'Workouts',
+    category: 'workout fitness',
+    imageUrl:
+        'https://images.pexels.com/photos/841130/pexels-photo-841130.jpeg?auto=compress&cs=tinysrgb&w=400',
   ),
 ];
 
@@ -173,16 +231,17 @@ class _SignupTopicsStepState extends State<SignupTopicsStep> {
               crossAxisCount: 3,
               mainAxisSpacing: 8.h,
               crossAxisSpacing: 8.w,
-              childAspectRatio: 0.78,
+              childAspectRatio: 0.82,
             ),
-            itemCount: _kTopics.length,
+            itemCount: kTopics.length,
             itemBuilder: (context, index) {
-              final topic = _kTopics[index];
+              final topic = kTopics[index];
               final isSelected = _selected.contains(index);
               return _TopicCard(
                 topic: topic,
                 isSelected: isSelected,
                 onTap: () => _toggle(index),
+                index: index,
               );
             },
           ),
@@ -195,9 +254,9 @@ class _SignupTopicsStepState extends State<SignupTopicsStep> {
             label: context.tr('general.next'),
             onPressed: () {
               final imageUrls =
-                  _selected.map((i) => _kTopics[i].imageUrl).toList();
+                  _selected.map((i) => kTopics[i].imageUrl).toList();
               final categories =
-                  _selected.map((i) => _kTopics[i].label).toList();
+                  _selected.map((i) => kTopics[i].category).toList();
               widget.onNext(TopicSelectionResult(
                 imageUrls: imageUrls,
                 categories: categories,
@@ -220,16 +279,19 @@ class _SignupTopicsStepState extends State<SignupTopicsStep> {
 // ─────────────────────────────────────────────────────────
 // Topic card
 // ─────────────────────────────────────────────────────────
+
 class _TopicCard extends StatelessWidget {
   const _TopicCard({
     required this.topic,
     required this.isSelected,
     required this.onTap,
+    required this.index,
   });
 
   final TopicItem topic;
   final bool isSelected;
   final VoidCallback onTap;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +300,7 @@ class _TopicCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Image ──
+          // ── Square image ──
           Expanded(
             child: Stack(
               fit: StackFit.expand,
@@ -248,6 +310,7 @@ class _TopicCard extends StatelessWidget {
                   child: CachedNetworkImage(
                     imageUrl: topic.imageUrl,
                     fit: BoxFit.cover,
+                    alignment: Alignment.center,
                     placeholder: (_, __) => Shimmer.fromColors(
                       baseColor: AppColors.surfaceVariantDark,
                       highlightColor: AppColors.surfaceDark,
@@ -272,36 +335,22 @@ class _TopicCard extends StatelessWidget {
                   ),
                 ),
 
-                // ── Selection overlay ──
-                if (isSelected)
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16.r),
-                        border: Border.all(
-                          color: AppColors.textPrimaryDark,
-                          width: 3.w,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                // ── Checkmark ──
+                // ── Checkmark circle (bottom-right) ──
                 if (isSelected)
                   Positioned(
-                    top: 6.h,
-                    right: 6.w,
+                    bottom: 8.h,
+                    right: 8.w,
                     child: Container(
-                      width: 22.w,
-                      height: 22.w,
-                      decoration: const BoxDecoration(
-                        color: AppColors.textPrimaryDark,
+                      width: 28.w,
+                      height: 28.w,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.55),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.check_rounded,
-                        color: AppColors.backgroundDark,
-                        size: 14.w,
+                        color: AppColors.textPrimaryDark,
+                        size: 16.w,
                       ),
                     ),
                   ),

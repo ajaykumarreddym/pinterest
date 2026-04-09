@@ -16,6 +16,7 @@ class SignupBirthdayStep extends StatefulWidget {
   const SignupBirthdayStep({
     super.key,
     required this.nameController,
+    required this.email,
     required this.onNext,
     required this.onNameUpdated,
     required this.onDateChanged,
@@ -23,6 +24,7 @@ class SignupBirthdayStep extends StatefulWidget {
   });
 
   final TextEditingController nameController;
+  final String email;
   final VoidCallback onNext;
   final VoidCallback onNameUpdated;
   final ValueChanged<DateTime> onDateChanged;
@@ -59,8 +61,14 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
   final int _startYear = 1920;
   late final int _endYear;
 
-  /// The last-saved name value. Empty until user taps "Set".
+  /// The prefilled name extracted from the email (part before @).
+  late String _prefillName;
+
+  /// The last-saved name value.
   String _savedName = '';
+
+  /// Whether the name has been initially prefilled.
+  bool _hasPrefilled = false;
 
   @override
   void initState() {
@@ -77,7 +85,27 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
     _yearController =
         FixedExtentScrollController(initialItem: _selectedYear - _startYear);
 
+    // Prefill name from email (part before @)
+    _prefillName = _extractNameFromEmail(widget.email);
+    if (widget.nameController.text.isEmpty && _prefillName.isNotEmpty) {
+      widget.nameController.text = _prefillName;
+      _savedName = _prefillName;
+      _hasPrefilled = true;
+    } else if (widget.nameController.text.isNotEmpty) {
+      _savedName = widget.nameController.text.trim();
+      _hasPrefilled = true;
+    }
+
     widget.nameController.addListener(_onNameChanged);
+  }
+
+  /// Extracts the local part of the email before '@'.
+  String _extractNameFromEmail(String email) {
+    final atIndex = email.indexOf('@');
+    if (atIndex > 0) {
+      return email.substring(0, atIndex);
+    }
+    return email;
   }
 
   @override
@@ -91,20 +119,38 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
 
   void _onNameChanged() => setState(() {});
 
-  /// Whether the name has been set at least once.
-  bool get _hasBeenSet => _savedName.isNotEmpty;
-
-  /// Whether the button should be enabled.
-  bool get _isButtonEnabled {
+  /// Whether the name value has changed from the saved value.
+  bool get _isNameChanged {
     final current = widget.nameController.text.trim();
     if (current.isEmpty) return false;
     return current != _savedName;
+  }
+
+  /// Whether the Update button should be enabled.
+  bool get _isUpdateButtonEnabled => _isNameChanged;
+
+  /// Whether the user is at least 14 years old based on selected date.
+  bool get _isAgeValid {
+    final now = DateTime.now();
+    final birthdate = DateTime(_selectedYear, _selectedMonth, _selectedDay);
+    final age = now.year - birthdate.year;
+    final hasHadBirthdayThisYear = now.month > birthdate.month ||
+        (now.month == birthdate.month && now.day >= birthdate.day);
+    final actualAge = hasHadBirthdayThisYear ? age : age - 1;
+    return actualAge >= 14;
+  }
+
+  /// Whether the Next button should be enabled.
+  bool get _isNextEnabled {
+    // Name must be set and age must be >= 14
+    return _hasPrefilled && _savedName.isNotEmpty && _isAgeValid;
   }
 
   void _handleSetName() {
     final name = widget.nameController.text.trim();
     if (name.isEmpty) return;
     setState(() => _savedName = name);
+    _hasPrefilled = true;
     FocusScope.of(context).unfocus();
     widget.onNameUpdated();
   }
@@ -115,6 +161,8 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
     widget.onDateChanged(
       DateTime(_selectedYear, _selectedMonth, _selectedDay),
     );
+    // Trigger rebuild to re-evaluate age validity
+    setState(() {});
   }
 
   int _daysInMonth(int month, int year) {
@@ -144,10 +192,10 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
               SizedBox(
                 height: 48.h,
                 child: ElevatedButton(
-                  onPressed: _isButtonEnabled ? _handleSetName : null,
+                  onPressed: _isUpdateButtonEnabled ? _handleSetName : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5F5F5F),
-                    foregroundColor: AppColors.textPrimaryDark,
+                    backgroundColor: AppColors.pinterestRed,
+                    foregroundColor: Colors.white,
                     disabledBackgroundColor: const Color(0xFF3A3A3A),
                     disabledForegroundColor: const Color(0xFF7A7A7A),
                     elevation: 0,
@@ -157,12 +205,10 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
                     padding: EdgeInsets.symmetric(horizontal: 20.w),
                   ),
                   child: Text(
-                    _hasBeenSet
-                        ? context.tr('auth.updateName')
-                        : context.tr('auth.set'),
+                    context.tr('auth.updateName'),
                     style: AppTypography.labelMedium.copyWith(
-                      color: _isButtonEnabled
-                          ? AppColors.textPrimaryDark
+                      color: _isUpdateButtonEnabled
+                          ? Colors.white
                           : const Color(0xFF7A7A7A),
                       fontSize: 14.sp,
                     ),
@@ -200,6 +246,20 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
           ),
           SizedBox(height: 24.h),
 
+          // ── Age warning ──
+          if (!_isAgeValid)
+            Padding(
+              padding: EdgeInsets.only(bottom: 8.h),
+              child: Text(
+                context.tr('auth.mustBe14OrOlder'),
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.pinterestRed,
+                  fontSize: 13.sp,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+
           // ── Info text ──
           Text(
             context.tr('auth.birthdateInfoTitle'),
@@ -224,8 +284,11 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
           AppButton(
             label: context.tr('general.next'),
             onPressed: widget.onNext,
+            isEnabled: _isNextEnabled,
             backgroundColor: AppColors.pinterestRed,
             foregroundColor: AppColors.textPrimaryDark,
+            disabledBackgroundColor: const Color(0xFF5F5F5F),
+            disabledForegroundColor: const Color(0xFF9B9B9B),
             height: 42.h,
           ),
           SizedBox(height: 16.h),

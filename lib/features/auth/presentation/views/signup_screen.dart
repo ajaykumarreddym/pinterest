@@ -201,7 +201,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     _goToStep(3);
   }
 
-  void _handleNextBirthday() => _goToStep(4);
+  void _handleNextBirthday() {
+    // Save birthday step details to local storage
+    final profile = UserProfile(
+      name: _nameController.text.trim(),
+      email: _emailController.text.trim(),
+      dateOfBirth: _selectedBirthdate.toIso8601String(),
+    );
+    ref.read(userProfileDatasourceProvider).saveProfile(profile);
+    _goToStep(4);
+  }
 
   void _handleGenderSelected(String gender) {
     setState(() => _selectedGender = gender);
@@ -288,6 +297,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     case 3:
                       return SignupBirthdayStep(
                         nameController: _nameController,
+                        email: _emailController.text.trim(),
                         selectedDate: _selectedBirthdate,
                         onDateChanged: (date) {
                           setState(() => _selectedBirthdate = date);

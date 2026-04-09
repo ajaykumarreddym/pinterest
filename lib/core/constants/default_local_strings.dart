@@ -58,6 +58,10 @@ class DefaultLocaleStrings {
     'home': {
       'all': 'All',
       'forYou': 'For you',
+      'yourTopPicks': 'Your top picks',
+      'selectPreferencesSubtitle': 'Select topics to personalise your feed',
+      'applyPreferences': 'Apply',
+      'preferencesUpToDate': 'Up to date',
     },
     'auth': {
       'onboardingTagline': 'Create a life\nyou love',

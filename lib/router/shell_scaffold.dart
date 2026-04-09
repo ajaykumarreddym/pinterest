@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
+import 'package:pinterest/features/home/presentation/providers/home_providers.dart';
 import 'package:pinterest/router/route_names.dart';
 
 final currentTabIndexProvider = StateProvider<int>((ref) => 0);
@@ -31,7 +32,7 @@ class ShellScaffold extends ConsumerWidget {
       body: child,
       bottomNavigationBar: _PinterestBottomNav(
         currentIndex: currentIndex,
-        onTap: (index) => _onItemTapped(index, context),
+        onTap: (index) => _onItemTapped(index, context, ref),
       ),
     );
   }
@@ -44,7 +45,13 @@ class ShellScaffold extends ConsumerWidget {
     return 0;
   }
 
-  void _onItemTapped(int index, BuildContext context) {
+  void _onItemTapped(int index, BuildContext context, WidgetRef ref) {
+    final currentIndex = _calculateSelectedIndex(context);
+    if (index == 0 && currentIndex == 0) {
+      // Already on Home — refresh the feed
+      ref.read(forYouPhotosProvider.notifier).refresh();
+      return;
+    }
     context.go(_tabs[index]);
   }
 }

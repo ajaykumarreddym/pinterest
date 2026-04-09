@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -79,15 +80,23 @@ class HomeNotifier extends AsyncNotifier<List<Photo>> {
 }
 
 /// Manages "For you" feed — searches Pexels using the user's
-/// selected topic categories, rotating through them for pagination.
+/// selected topic categories.
+///
+/// Unlike sequential topic fetching, this uses a Pinterest-style
+/// interleaved approach: fetches a small batch from EACH topic in
+/// parallel and shuffles them together so the feed feels diverse
+/// and mixed, not grouped by category.
 class ForYouNotifier extends AsyncNotifier<List<Photo>> {
   int _currentPage = 1;
   bool _hasMore = true;
   bool _isLoadingMore = false;
   List<String> _topics = [];
 
-  /// Index into [_topics] to rotate query per page.
-  int _topicIndex = 0;
+  /// Per-topic page trackers for independent pagination.
+  final Map<String, int> _topicPages = {};
+
+  /// Random instance for Fisher-Yates shuffle with weighted interleaving.
+  final _random = Random();
 
   bool get hasMore => _hasMore;
   bool get isLoadingMore => _isLoadingMore;
@@ -108,38 +117,105 @@ class ForYouNotifier extends AsyncNotifier<List<Photo>> {
     }
 
     _currentPage = 1;
-    _topicIndex = 0;
     _hasMore = true;
-    return _fetchTopicPhotos();
+    _topicPages.clear();
+    for (final topic in _topics) {
+      _topicPages[topic] = 1;
+    }
+
+    return _fetchMixedPhotos();
   }
 
-  Future<List<Photo>> _fetchTopicPhotos() async {
+  /// Fetches photos from multiple topics in parallel, then interleaves
+  /// and shuffles them for a diverse, Pinterest-style mixed feed.
+  Future<List<Photo>> _fetchMixedPhotos() async {
     if (_topics.isEmpty) return [];
 
-    final query = _topics[_topicIndex % _topics.length];
-    AppLogger.info('🔍 ForYou search: "$query" page $_currentPage');
+    // Determine how many photos to fetch per topic.
+    // We distribute the total page size across topics so the feed
+    // stays mixed. Each topic gets a roughly equal share.
+    final totalPerPage = AppConstants.defaultPageSize;
+    final perTopic = (totalPerPage / _topics.length).ceil().clamp(3, 10);
+
+    AppLogger.info(
+      '🔀 ForYou fetching $perTopic photos each from ${_topics.length} topics',
+    );
 
     final useCase = ref.read(searchPhotosUseCaseProvider);
-    final result = await useCase(
-      SearchPhotosParams(
-        query: query,
-        page: _currentPage,
-        perPage: AppConstants.defaultPageSize,
-      ),
+    final seenIds = <int>{};
+
+    // Fetch from all topics in parallel.
+    final futures = _topics.map((topic) async {
+      final page = _topicPages[topic] ?? 1;
+      AppLogger.info('🔍 ForYou search: "$topic" page $page');
+
+      final result = await useCase(
+        SearchPhotosParams(
+          query: topic,
+          page: page,
+          perPage: perTopic,
+        ),
+      );
+
+      return result.fold(
+        (failure) {
+          AppLogger.error('❌ ForYou topic "$topic" failed: ${failure.message}');
+          return <Photo>[];
+        },
+        (photos) {
+          AppLogger.info('✅ ForYou got ${photos.length} photos for "$topic"');
+          return photos;
+        },
+      );
+    }).toList();
+
+    final results = await Future.wait(futures);
+
+    // Interleave results using a round-robin + shuffle approach.
+    // This ensures diversity: we pick one from each topic in rotation,
+    // then shuffle small groups to break any visual patterns.
+    final interleaved = <Photo>[];
+    final queues = results.map((list) => List<Photo>.from(list)).toList();
+    var maxLen = queues.fold<int>(0, (m, q) => q.length > m ? q.length : m);
+
+    // Round-robin pick from each topic queue.
+    for (var i = 0; i < maxLen; i++) {
+      for (var q = 0; q < queues.length; q++) {
+        if (i < queues[q].length) {
+          final photo = queues[q][i];
+          if (seenIds.add(photo.id)) {
+            interleaved.add(photo);
+          }
+        }
+      }
+    }
+
+    // Apply a soft shuffle: shuffle within small windows to add variety
+    // without completely destroying the interleaved balance.
+    _softShuffle(interleaved, windowSize: 6);
+
+    // Check if we've reached the end of available content.
+    final totalFetched = results.fold<int>(0, (s, list) => s + list.length);
+    if (totalFetched < _topics.length * perTopic * 0.5) {
+      _hasMore = false;
+    }
+
+    AppLogger.info(
+      '🔀 ForYou interleaved feed: ${interleaved.length} mixed photos',
     );
 
-    return result.fold(
-      (failure) {
-        AppLogger.error('❌ ForYouNotifier failure: ${failure.message}');
-        throw failure;
-      },
-      (photos) {
-        if (photos.length < AppConstants.defaultPageSize) {
-          _hasMore = false;
-        }
-        return photos;
-      },
-    );
+    return interleaved;
+  }
+
+  /// Shuffles elements within sliding windows of [windowSize] to add
+  /// local variety while preserving overall topic distribution balance.
+  void _softShuffle(List<Photo> list, {int windowSize = 6}) {
+    for (var i = 0; i < list.length; i += windowSize ~/ 2) {
+      final end = (i + windowSize).clamp(0, list.length);
+      final window = list.sublist(i, end);
+      window.shuffle(_random);
+      list.setRange(i, end, window);
+    }
   }
 
   Future<void> loadMore() async {
@@ -148,14 +224,25 @@ class ForYouNotifier extends AsyncNotifier<List<Photo>> {
 
     final currentPhotos = state.valueOrNull ?? [];
     _currentPage++;
-    _topicIndex++;
+
+    // Advance page for each topic.
+    for (final topic in _topics) {
+      _topicPages[topic] = (_topicPages[topic] ?? 1) + 1;
+    }
 
     try {
-      final newPhotos = await _fetchTopicPhotos();
-      state = AsyncData([...currentPhotos, ...newPhotos]);
+      final newPhotos = await _fetchMixedPhotos();
+
+      // Deduplicate against existing feed.
+      final existingIds = currentPhotos.map((p) => p.id).toSet();
+      final uniqueNew = newPhotos.where((p) => !existingIds.contains(p.id)).toList();
+
+      state = AsyncData([...currentPhotos, ...uniqueNew]);
     } catch (e) {
       _currentPage--;
-      _topicIndex--;
+      for (final topic in _topics) {
+        _topicPages[topic] = (_topicPages[topic] ?? 2) - 1;
+      }
     } finally {
       _isLoadingMore = false;
     }
@@ -163,9 +250,13 @@ class ForYouNotifier extends AsyncNotifier<List<Photo>> {
 
   Future<void> refresh() async {
     _currentPage = 1;
-    _topicIndex = 0;
     _hasMore = true;
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() => _fetchTopicPhotos());
+    _topicPages.clear();
+    for (final topic in _topics) {
+      _topicPages[topic] = 1;
+    }
+    // Keep previous data visible while refreshing
+    state = const AsyncLoading<List<Photo>>().copyWithPrevious(state);
+    state = await AsyncValue.guard(() => _fetchMixedPhotos());
   }
 }

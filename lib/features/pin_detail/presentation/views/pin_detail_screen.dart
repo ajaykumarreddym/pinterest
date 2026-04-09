@@ -9,8 +9,8 @@ import 'package:pinterest/features/localization/presentation/extensions/localiza
 import 'package:pinterest/core/design_systems/borders/app_borders.dart';
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
 import 'package:pinterest/features/home/domain/entities/photo.dart';
-import 'package:pinterest/features/home/presentation/providers/home_providers.dart';
 import 'package:pinterest/features/home/presentation/widgets/pin_card.dart';
+import 'package:pinterest/features/pin_detail/presentation/providers/pin_detail_providers.dart';
 
 /// Pin detail screen showing full image, actions, and related pins.
 class PinDetailScreen extends ConsumerWidget {
@@ -20,98 +20,25 @@ class PinDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final photosAsync = ref.watch(homePhotosProvider);
+    final id = int.tryParse(pinId);
+    if (id == null) {
+      return Scaffold(
+        backgroundColor: AppColors.backgroundDark,
+        body: Center(
+          child: Text(
+            context.tr('errors.pinNotFound'),
+            style: const TextStyle(color: AppColors.textSecondaryDark),
+          ),
+        ),
+      );
+    }
+
+    final photoAsync = ref.watch(pinDetailProvider(id));
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
-      body: photosAsync.when(
-        data: (photos) {
-          final id = int.tryParse(pinId);
-          final photo = photos.where((p) => p.id == id).firstOrNull;
-
-          if (photo == null) {
-            return Center(
-              child: Text(
-                context.tr('errors.pinNotFound'),
-                style: const TextStyle(color: AppColors.textSecondaryDark),
-              ),
-            );
-          }
-
-          // Get related pins (exclude current)
-          final relatedPins =
-              photos.where((p) => p.id != id).take(10).toList();
-
-          return CustomScrollView(
-            slivers: [
-              // Image with back/share buttons
-              SliverToBoxAdapter(
-                child: _PinImage(pinId: pinId, photo: photo),
-              ),
-
-              // Action bar
-              SliverToBoxAdapter(
-                child: _ActionBar(photo: photo),
-              ),
-
-              // Photographer info + Follow
-              SliverToBoxAdapter(
-                child: _PhotographerRow(photo: photo),
-              ),
-
-              // Description / alt text
-              if (photo.alt.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 0),
-                    child: Text(
-                      photo.alt,
-                      style: TextStyle(
-                        color: AppColors.textPrimaryDark,
-                        fontSize: 14.sp,
-                        height: 1.4,
-                      ),
-                    ),
-                  ),
-                ),
-
-              // "More like this" header
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(16.w, 24.h, 16.w, 12.h),
-                  child: Center(
-                    child: Text(
-                      context.tr('pinDetail.moreLikeThis'),
-                      style: TextStyle(
-                        color: AppColors.textPrimaryDark,
-                        fontSize: 18.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Related pins masonry grid
-              if (relatedPins.isNotEmpty)
-                SliverPadding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.w),
-                  sliver: SliverMasonryGrid.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 4,
-                    crossAxisSpacing: 4,
-                    childCount: relatedPins.length,
-                    itemBuilder: (context, index) {
-                      return PinCard(photo: relatedPins[index]);
-                    },
-                  ),
-                ),
-
-              // Bottom padding
-              SliverToBoxAdapter(child: SizedBox(height: 32.h)),
-            ],
-          );
-        },
+      body: photoAsync.when(
+        data: (photo) => _PinDetailContent(pinId: pinId, photo: photo),
         loading: () => const Center(
           child: CircularProgressIndicator(color: AppColors.pinterestRed),
         ),
@@ -125,6 +52,124 @@ class PinDetailScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Main content widget that displays the pin and its related photos.
+class _PinDetailContent extends ConsumerWidget {
+  const _PinDetailContent({required this.pinId, required this.photo});
+
+  final String pinId;
+  final Photo photo;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Fetch related photos based on the pin's alt text / description.
+    final relatedAsync = ref.watch(
+      relatedPhotosProvider((pinId: photo.id, query: photo.alt)),
+    );
+
+    return CustomScrollView(
+      slivers: [
+        // Image with back/share buttons
+        SliverToBoxAdapter(
+          child: _PinImage(pinId: pinId, photo: photo),
+        ),
+
+        // Action bar
+        SliverToBoxAdapter(
+          child: _ActionBar(photo: photo),
+        ),
+
+        // Photographer info + Follow
+        SliverToBoxAdapter(
+          child: _PhotographerRow(photo: photo),
+        ),
+
+        // Description / alt text
+        if (photo.alt.isNotEmpty)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 0),
+              child: Text(
+                photo.alt,
+                style: TextStyle(
+                  color: AppColors.textPrimaryDark,
+                  fontSize: 14.sp,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ),
+
+        // "More like this" header
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16.w, 24.h, 16.w, 12.h),
+            child: Center(
+              child: Text(
+                context.tr('pinDetail.moreLikeThis'),
+                style: TextStyle(
+                  color: AppColors.textPrimaryDark,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+        ),
+
+        // Related pins masonry grid
+        relatedAsync.when(
+          data: (relatedPins) {
+            if (relatedPins.isEmpty) {
+              return SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24.h),
+                  child: Center(
+                    child: Text(
+                      context.tr('search.noResultsFor'),
+                      style: TextStyle(
+                        color: AppColors.textTertiaryDark,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+            return SliverPadding(
+              padding: EdgeInsets.symmetric(horizontal: 4.w),
+              sliver: SliverMasonryGrid.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 4,
+                crossAxisSpacing: 4,
+                childCount: relatedPins.length,
+                itemBuilder: (context, index) {
+                  return PinCard(photo: relatedPins[index]);
+                },
+              ),
+            );
+          },
+          loading: () => SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 32.h),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.pinterestRed,
+                ),
+              ),
+            ),
+          ),
+          error: (_, __) => const SliverToBoxAdapter(
+            child: SizedBox.shrink(),
+          ),
+        ),
+
+        // Bottom padding
+        SliverToBoxAdapter(child: SizedBox(height: 32.h)),
+      ],
     );
   }
 }

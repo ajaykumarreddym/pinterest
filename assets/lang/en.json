@@ -49,7 +49,11 @@
   },
   "home": {
     "all": "All",
-    "forYou": "For you"
+    "forYou": "For you",
+    "yourTopPicks": "Your top picks",
+    "selectPreferencesSubtitle": "Select topics to personalise your feed",
+    "applyPreferences": "Apply",
+    "preferencesUpToDate": "Up to date"
   },
   "auth": {
     "onboardingTagline": "Create a life\nyou love",
@@ -111,6 +115,7 @@
     "enterYourNameHere": "Enter your name here",
     "birthdateInfoTitle": "Knowing your age helps keep Pinterest safe for everyone. It won't be visible to others.",
     "birthdateInfoSubtitle": "Use your own birthdate, even if this is a business account.",
+    "mustBe14OrOlder": "You must be at least 14 years old to use Pinterest.",
     "whatIsYourGender": "What is your gender?",
     "genderSubtitle": "This helps us find you more relevant content. We won't show it on your profile.",
     "female": "Female",

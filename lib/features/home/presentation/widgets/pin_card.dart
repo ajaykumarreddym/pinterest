@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,10 +15,9 @@ import 'package:pinterest/features/home/presentation/widgets/pin_long_press_over
 import 'package:pinterest/router/route_names.dart';
 
 class PinCard extends StatefulWidget {
-  const PinCard({super.key, required this.photo, this.showAuthor = true});
+  const PinCard({super.key, required this.photo});
 
   final Photo photo;
-  final bool showAuthor;
 
   @override
   State<PinCard> createState() => _PinCardState();
@@ -25,7 +26,7 @@ class PinCard extends StatefulWidget {
 class _PinCardState extends State<PinCard> {
   final _imageKey = GlobalKey();
 
-  void _onLongPress() {
+  void _onLongPress([Offset? globalPressPosition]) {
     HapticFeedback.mediumImpact();
 
     final renderBox =
@@ -41,15 +42,20 @@ class _PinCardState extends State<PinCard> {
       size.height,
     );
 
+    final pressPos = globalPressPosition ??
+        Offset(position.dx + size.width / 2, position.dy + size.height / 2);
+
     showPinLongPressOverlay(
       context: context,
       photo: widget.photo,
       cardRect: cardRect,
+      pressPosition: pressPos,
       actions: [
         PinAction(
           icon: Icons.push_pin_outlined,
           label: 'Save',
           onTap: () {},
+          iconRotation: math.pi / 4,
         ),
         PinAction(
           icon: Icons.share,
@@ -84,7 +90,7 @@ class _PinCardState extends State<PinCard> {
           pathParameters: {'id': widget.photo.id.toString()},
         );
       },
-      onLongPress: _onLongPress,
+      onLongPressStart: (details) => _onLongPress(details.globalPosition),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -119,58 +125,27 @@ class _PinCardState extends State<PinCard> {
                       ),
                       fadeInDuration: const Duration(milliseconds: 200),
                     ),
-                    // "..." menu button at bottom-right
-                    Positioned(
-                      bottom: 6.h,
-                      right: 6.w,
-                      child: GestureDetector(
-                        onTap: _onLongPress,
-                        child: Container(
-                          width: 28.w,
-                          height: 28.w,
-                          decoration: BoxDecoration(
-                            color: AppColors.overlayDark,
-                            borderRadius: BorderRadius.circular(14.r),
-                          ),
-                          child: Icon(
-                            Icons.more_horiz,
-                            color: Colors.white,
-                            size: 16.sp,
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
             ),
           ),
-          // Photographer info below image
-          if (widget.showAuthor)
-            Padding(
-              padding: EdgeInsets.only(
-                top: 6.h,
-                left: 4.w,
-                right: 4.w,
-                bottom: 2.h,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.photo.photographer,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppColors.textSecondaryDark,
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                ],
+          // "..." menu button outside card, bottom-right
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: _onLongPress,
+              child: Padding(
+                padding: EdgeInsets.only(top: 4.h, right: 2.w),
+                child: Icon(
+                  Icons.more_horiz,
+                  color: AppColors.textSecondaryDark,
+                  size: 18.sp,
+                ),
               ),
             ),
+          ),
+
         ],
       ),
     );
