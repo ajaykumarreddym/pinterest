@@ -1,6 +1,7 @@
 import 'package:clerk_auth/clerk_auth.dart' as clerk;
 import 'package:clerk_flutter/clerk_flutter.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:pinterest/core/di/injection.dart';
@@ -413,10 +414,17 @@ class AuthNotifier extends Notifier<AuthStatus> {
       }
     }
 
+    // Clear all user data from local storage
     final local = ref.read(authLocalDatasourceProvider);
-    await local.clearAuth();
+    await local.clearAllUserData();
+
+    // Clear image cache
+    await DefaultCacheManager().emptyCache();
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
+
     state = AuthStatus.unauthenticated;
-    AppLogger.info('🚪 User logged out');
+    AppLogger.info('🚪 User logged out — all local data cleared');
   }
 }
 

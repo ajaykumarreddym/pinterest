@@ -89,7 +89,6 @@ class _ChatInputState extends State<ChatInput> {
                     hintStyle: AppTypography.bodyMedium.copyWith(
                       color: AppColors.textTertiaryDark,
                     ),
-                    filled: false,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
                     border: InputBorder.none,
