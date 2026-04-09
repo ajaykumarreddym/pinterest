@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:clerk_flutter/clerk_flutter.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +8,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:pinterest/features/auth/presentation/providers/auth_providers.dart';
+import 'package:pinterest/features/create/domain/entities/board.dart';
+import 'package:pinterest/features/create/domain/entities/collage.dart';
+import 'package:pinterest/features/create/presentation/providers/create_providers.dart';
 import 'package:pinterest/features/home/presentation/providers/saved_pins_providers.dart';
 import 'package:pinterest/features/localization/presentation/extensions/localization_extension.dart';
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
@@ -213,23 +218,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                   // Pins tab
                   _buildPinsGrid(),
                   // Boards tab
-                  Center(
-                    child: Text(
-                      context.tr('profile.noBoardsYet'),
-                      style: const TextStyle(
-                        color: AppColors.textSecondaryDark,
-                      ),
-                    ),
-                  ),
+                  _buildBoardsGrid(),
                   // Collages tab
-                  Center(
-                    child: Text(
-                      context.tr('profile.noCollagesYet'),
-                      style: const TextStyle(
-                        color: AppColors.textSecondaryDark,
-                      ),
-                    ),
-                  ),
+                  _buildCollagesGrid(),
                 ],
               ),
             ),
@@ -412,6 +403,222 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
             fontSize: 14.sp,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildBoardsGrid() {
+    final boards = ref.watch(boardsProvider);
+    if (boards.isEmpty) {
+      return _buildEmptyTab(
+        icon: Icons.dashboard_outlined,
+        title: context.tr('profile.noBoardsYet'),
+        subtitle: 'Create boards to organize your pins',
+      );
+    }
+    return ListView.builder(
+      padding: EdgeInsets.all(8.w),
+      itemCount: boards.length,
+      itemBuilder: (context, index) {
+        final board = boards[index];
+        return _BoardCard(board: board);
+      },
+    );
+  }
+
+  Widget _buildCollagesGrid() {
+    final collages = ref.watch(collagesProvider);
+    if (collages.isEmpty) {
+      return _buildEmptyTab(
+        icon: Icons.auto_awesome_mosaic_outlined,
+        title: context.tr('profile.noCollagesYet'),
+        subtitle: 'Create collages from your images',
+      );
+    }
+    return GridView.builder(
+      padding: EdgeInsets.all(4.w),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 4.w,
+        mainAxisSpacing: 4.w,
+      ),
+      itemCount: collages.length,
+      itemBuilder: (context, index) {
+        final collage = collages[index];
+        return _CollageCard(collage: collage);
+      },
+    );
+  }
+
+  Widget _buildEmptyTab({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: AppColors.textTertiaryDark, size: 48.sp),
+          SizedBox(height: 16.h),
+          Text(
+            title,
+            style: TextStyle(
+              color: AppColors.textSecondaryDark,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            subtitle,
+            style: TextStyle(
+              color: AppColors.textTertiaryDark,
+              fontSize: 13.sp,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BoardCard extends StatelessWidget {
+  const _BoardCard({required this.board});
+
+  final Board board;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 8.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariantDark,
+        borderRadius: BorderRadius.circular(16.r),
+      ),
+      child: Row(
+        children: [
+          // Cover thumbnail
+          Container(
+            width: 56.w,
+            height: 56.w,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceDark,
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: board.coverImagePath.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12.r),
+                    child: Image.file(
+                      File(board.coverImagePath),
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Icon(
+                    Icons.dashboard_outlined,
+                    color: AppColors.textTertiaryDark,
+                    size: 24.sp,
+                  ),
+          ),
+          SizedBox(width: 12.w),
+          // Board info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  board.name,
+                  style: TextStyle(
+                    color: AppColors.textPrimaryDark,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  '${board.pinIds.length} pins',
+                  style: TextStyle(
+                    color: AppColors.textTertiaryDark,
+                    fontSize: 12.sp,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CollageCard extends StatelessWidget {
+  const _CollageCard({required this.collage});
+
+  final Collage collage;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12.r),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          if (collage.imagePaths.isNotEmpty)
+            Image.file(
+              File(collage.imagePaths.first),
+              fit: BoxFit.cover,
+            )
+          else
+            Container(color: AppColors.surfaceDark),
+          // Overlay with title + count
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: 8.w,
+                vertical: 6.h,
+              ),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withOpacity(0.7),
+                  ],
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    collage.title,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '${collage.imagePaths.length} images',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
+import 'package:pinterest/features/create/presentation/widgets/create_bottom_sheet.dart';
 import 'package:pinterest/features/home/presentation/providers/home_providers.dart';
 import 'package:pinterest/router/route_names.dart';
 
@@ -46,6 +47,11 @@ class ShellScaffold extends ConsumerWidget {
   }
 
   void _onItemTapped(int index, BuildContext context, WidgetRef ref) {
+    if (index == 2) {
+      // Create tab — show bottom sheet instead of navigating
+      showCreateBottomSheet(context);
+      return;
+    }
     final currentIndex = _calculateSelectedIndex(context);
     if (index == 0 && currentIndex == 0) {
       // Already on Home — refresh the feed

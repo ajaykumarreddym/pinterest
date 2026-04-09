@@ -79,10 +79,20 @@ class AuthNotifier extends Notifier<AuthStatus> {
     } catch (_) {}
 
     // Step 1: Identify the user (creates sign-in object).
-    await clerkAuth.attemptSignIn(
-      strategy: clerk.Strategy.emailAddress,
-      identifier: email,
-    );
+    try {
+      await clerkAuth.attemptSignIn(
+        strategy: clerk.Strategy.emailAddress,
+        identifier: email,
+      );
+    } catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('not found') ||
+          msg.contains("couldn't find") ||
+          msg.contains('no account')) {
+        throw Exception('Account not found. Please sign up first.');
+      }
+      rethrow;
+    }
 
     if (clerkAuth.signIn == null && clerkAuth.client.user == null) {
       throw Exception('Account not found. Please sign up first.');

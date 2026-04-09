@@ -271,9 +271,21 @@ class _ActionBar extends ConsumerWidget {
             },
           ),
           SizedBox(width: 20.w),
+          // Share
+          _ActionIcon(
+            icon: Icons.share_outlined,
+            onTap: () {
+              ref.read(shareServiceProvider).shareImage(
+                    imageUrl: photo.src.medium,
+                    text: photo.alt.isNotEmpty
+                        ? photo.alt
+                        : 'Check out this pin!',
+                  );
+            },
+          ),
+          SizedBox(width: 20.w),
           // Comment
-          // _ActionIcon(icon: Icons.chat_bubble_outline, onTap: () {}),
-          // SizedBox(width: 20.w), 
+         
           // More options — opens bottom sheet
           _ActionIcon(
             icon: Icons.more_horiz,
@@ -289,8 +301,8 @@ class _ActionBar extends ConsumerWidget {
             },
             child: Container(
               padding: EdgeInsets.symmetric(
-                horizontal: 20.w,
-                vertical: 10.h,
+                horizontal: 14.w,
+                vertical: 8.h,
               ),
               decoration: BoxDecoration(
                 color: isSaved
@@ -304,7 +316,7 @@ class _ActionBar extends ConsumerWidget {
                     : context.tr('general.save'),
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 15.sp,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -354,6 +366,206 @@ class _PhotographerRow extends StatelessWidget {
                 fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+// Comment bottom sheet
+// ─────────────────────────────────────────────────────────
+
+void _showCommentSheet(BuildContext context, Photo photo) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    useRootNavigator: true,
+    builder: (_) => _CommentSheet(photo: photo),
+  );
+}
+
+class _CommentSheet extends StatefulWidget {
+  const _CommentSheet({required this.photo});
+
+  final Photo photo;
+
+  @override
+  State<_CommentSheet> createState() => _CommentSheetState();
+}
+
+class _CommentSheetState extends State<_CommentSheet> {
+  final _controller = TextEditingController();
+  final _comments = <String>[];
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _addComment() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    setState(() {
+      _comments.insert(0, text);
+    });
+    _controller.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+
+    return Container(
+      height: MediaQuery.sizeOf(context).height * 0.6,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceVariantDark,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+      ),
+      child: Column(
+        children: [
+          // Handle
+          Padding(
+            padding: EdgeInsets.only(top: 10.h, bottom: 8.h),
+            child: Container(
+              width: 40.w,
+              height: 4.h,
+              decoration: BoxDecoration(
+                color: AppColors.textTertiaryDark,
+                borderRadius: BorderRadius.circular(2.r),
+              ),
+            ),
+          ),
+          Text(
+            'Comments',
+            style: TextStyle(
+              color: AppColors.textPrimaryDark,
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          Divider(color: AppColors.dividerDark, height: 1),
+          Expanded(
+            child: _comments.isEmpty
+                ? Center(
+                    child: Text(
+                      'No comments yet',
+                      style: TextStyle(
+                        color: AppColors.textTertiaryDark,
+                        fontSize: 14.sp,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 12.h,
+                    ),
+                    itemCount: _comments.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 12.h),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 14.r,
+                              backgroundColor: AppColors.backgroundDark,
+                              child: Icon(
+                                Icons.person,
+                                size: 16.sp,
+                                color: AppColors.textTertiaryDark,
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'You',
+                                    style: TextStyle(
+                                      color: AppColors.textPrimaryDark,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2.h),
+                                  Text(
+                                    _comments[index],
+                                    style: TextStyle(
+                                      color: AppColors.textSecondaryDark,
+                                      fontSize: 13.sp,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              12.w,
+              8.h,
+              12.w,
+              bottomInset + 12.h,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 14.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.backgroundDark,
+                      borderRadius: BorderRadius.circular(24.r),
+                    ),
+                    child: TextField(
+                      controller: _controller,
+                      style: TextStyle(
+                        color: AppColors.textPrimaryDark,
+                        fontSize: 14.sp,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Add a comment...',
+                        hintStyle: TextStyle(
+                          color: AppColors.textTertiaryDark,
+                          fontSize: 14.sp,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10.h),
+                      ),
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _addComment(),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                GestureDetector(
+                  onTap: _addComment,
+                  child: Container(
+                    width: 36.w,
+                    height: 36.w,
+                    decoration: const BoxDecoration(
+                      color: AppColors.pinterestRed,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.arrow_upward_rounded,
+                      color: Colors.white,
+                      size: 20.sp,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

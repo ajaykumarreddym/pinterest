@@ -34,7 +34,9 @@ const _kTotalSteps = 8;
 /// Step 6: Topics selection
 /// Step 7: Confirmation
 class SignUpScreen extends ConsumerStatefulWidget {
-  const SignUpScreen({super.key});
+  const SignUpScreen({super.key, this.prefillEmail});
+
+  final String? prefillEmail;
 
   @override
   ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
@@ -61,6 +63,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.prefillEmail != null && widget.prefillEmail!.isNotEmpty) {
+      _emailController.text = widget.prefillEmail!;
+    }
     _emailController.addListener(_onEmailChanged);
     _passwordController.addListener(_onPasswordChanged);
   }

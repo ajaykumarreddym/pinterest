@@ -8,7 +8,8 @@ class AssetConstants {
 
   // Icons
   static const String iconsPath = 'assets/icons';
-  static const String pinterestLogo = '$iconsPath/pinterest_logo.svg';
+  static const String pinterestLogo = '$iconsPath/pinterest.svg';
+  static const String pinterestPng = '$imagesPath/pinterest.png';
   static const String googleLogo = '$iconsPath/google_logo.svg';
 
   // Animations

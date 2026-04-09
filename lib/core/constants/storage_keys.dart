@@ -16,4 +16,7 @@ class StorageKeys {
   static const String likedPinIds = 'liked_pin_ids';
   static const String reportedPinIds = 'reported_pin_ids';
   static const String hiddenPinIds = 'hidden_pin_ids';
+  static const String createdPins = 'created_pins';
+  static const String boards = 'boards';
+  static const String collages = 'collages';
 }

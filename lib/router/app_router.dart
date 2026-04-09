@@ -60,7 +60,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: RouteNames.signUp,
         path: RoutePaths.signUp,
-        builder: (context, state) => const SignUpScreen(),
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'];
+          return SignUpScreen(prefillEmail: email);
+        },
       ),
       GoRoute(
         name: RouteNames.emailVerification,

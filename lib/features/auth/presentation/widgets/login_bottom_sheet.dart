@@ -12,6 +12,7 @@ import 'package:pinterest/core/ui/atoms/app_text_field.dart';
 import 'package:pinterest/core/ui/atoms/app_toast.dart';
 import 'package:pinterest/core/utils/validators/validators.dart';
 import 'package:pinterest/features/auth/presentation/providers/auth_providers.dart';
+import 'package:pinterest/features/auth/presentation/views/signup_screen.dart';
 import 'package:pinterest/features/auth/presentation/widgets/forgot_password_bottom_sheet.dart';
 import 'package:pinterest/features/localization/presentation/extensions/localization_extension.dart';
 
@@ -92,7 +93,28 @@ class _LoginBottomSheetContentState
             password: _passwordController.text,
           );
     } catch (e) {
-      if (mounted) {
+      if (!mounted) return;
+      final errorMsg = e.toString().toLowerCase();
+      final isAccountNotFound = errorMsg.contains('not found') ||
+          errorMsg.contains("couldn't find") ||
+          errorMsg.contains('account not found') ||
+          errorMsg.contains('please sign up');
+
+      if (isAccountNotFound) {
+        final email = _emailController.text.trim();
+        Navigator.of(context).pop(); // close login sheet
+        AppToast.info(
+          null,
+          message: 'Account not found. Redirecting to sign up...',
+        );
+        if (context.mounted) {
+          Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => SignUpScreen(prefillEmail: email),
+            ),
+          );
+        }
+      } else {
         AppToast.error(context, message: e.toString());
       }
     }
