@@ -252,9 +252,12 @@ class ForYouNotifier extends AsyncNotifier<List<Photo>> {
     _currentPage = 1;
     _hasMore = true;
     _topicPages.clear();
+    // Randomize starting page per topic (1–5) for varied results
     for (final topic in _topics) {
-      _topicPages[topic] = 1;
+      _topicPages[topic] = _random.nextInt(5) + 1;
     }
+    // Shuffle topic order for extra variety
+    _topics = List<String>.from(_topics)..shuffle(_random);
     // Keep previous data visible while refreshing
     state = const AsyncLoading<List<Photo>>().copyWithPrevious(state);
     state = await AsyncValue.guard(() => _fetchMixedPhotos());
