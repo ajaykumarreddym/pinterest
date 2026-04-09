@@ -89,5 +89,14 @@
 			</array>
 		</dict>
 	</array>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Pinterest needs access to save images to your photo library.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Pinterest needs access to your photo library to save and share images.</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>whatsapp</string>
+		<string>https</string>
+	</array>
 </dict>
 </plist>

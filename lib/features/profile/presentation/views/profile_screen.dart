@@ -3,10 +3,13 @@ import 'package:clerk_flutter/clerk_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:pinterest/features/auth/presentation/providers/auth_providers.dart';
+import 'package:pinterest/features/home/presentation/providers/saved_pins_providers.dart';
 import 'package:pinterest/features/localization/presentation/extensions/localization_extension.dart';
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
+import 'package:pinterest/router/route_names.dart';
 
 /// User profile screen with Pins/Boards/Collages tabs.
 class ProfileScreen extends ConsumerStatefulWidget {
@@ -138,13 +141,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                   SizedBox(height: 8.h),
 
                   // Followers / following placeholder
-                  Text(
-                    '0 ${context.tr('profile.pins').toLowerCase()}',
-                    style: TextStyle(
-                      color: AppColors.textTertiaryDark,
-                      fontSize: 12.sp,
-                    ),
-                  ),
+                  _buildPinCount(),
 
                   if (isGuest) ...[
                     SizedBox(height: 12.h),
@@ -323,23 +320,99 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     );
   }
 
-  Widget _buildPinsGrid() {
-    return GridView.builder(
-      padding: EdgeInsets.all(4.w),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 2.w,
-        mainAxisSpacing: 2.w,
+  Widget _buildPinCount() {
+    final savedPins = ref.watch(savedPinsProvider);
+    final count = savedPins.valueOrNull?.length ?? 0;
+    return Text(
+      '$count ${context.tr('profile.pins').toLowerCase()}',
+      style: TextStyle(
+        color: AppColors.textTertiaryDark,
+        fontSize: 12.sp,
       ),
-      itemCount: 6,
-      itemBuilder: (context, index) {
-        return Container(
-          decoration: BoxDecoration(
-            color: AppColors.surfaceDark,
-            borderRadius: BorderRadius.circular(8.r),
+    );
+  }
+
+  Widget _buildPinsGrid() {
+    final savedPins = ref.watch(savedPinsProvider);
+    return savedPins.when(
+      data: (pins) {
+        if (pins.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.push_pin_outlined,
+                  color: AppColors.textTertiaryDark,
+                  size: 48.sp,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  'No saved pins yet',
+                  style: TextStyle(
+                    color: AppColors.textSecondaryDark,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  'Save pins to see them here',
+                  style: TextStyle(
+                    color: AppColors.textTertiaryDark,
+                    fontSize: 13.sp,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        return GridView.builder(
+          padding: EdgeInsets.all(4.w),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 2.w,
+            mainAxisSpacing: 2.w,
           ),
+          itemCount: pins.length,
+          itemBuilder: (context, index) {
+            final photo = pins[index];
+            return GestureDetector(
+              onTap: () {
+                context.push('${RoutePaths.pinDetail}/${photo.id}');
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.r),
+                child: CachedNetworkImage(
+                  imageUrl: photo.src.small,
+                  fit: BoxFit.cover,
+                  placeholder: (_, __) => Container(
+                    color: AppColors.surfaceDark,
+                  ),
+                  errorWidget: (_, __, ___) => Container(
+                    color: AppColors.surfaceDark,
+                    child: const Icon(Icons.broken_image_outlined),
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
+      loading: () => const Center(
+        child: CircularProgressIndicator(
+          color: AppColors.pinterestRed,
+        ),
+      ),
+      error: (_, __) => Center(
+        child: Text(
+          'Failed to load saved pins',
+          style: TextStyle(
+            color: AppColors.textSecondaryDark,
+            fontSize: 14.sp,
+          ),
+        ),
+      ),
     );
   }
 }

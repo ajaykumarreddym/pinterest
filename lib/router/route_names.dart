@@ -21,6 +21,7 @@ class RouteNames {
 
   // Detail
   static const String pinDetail = 'pinDetail';
+  static const String imageSearch = 'imageSearch';
 
   // Settings
   static const String settings = 'settings';
@@ -41,5 +42,6 @@ class RoutePaths {
   static const String messages = '/messages';
   static const String profile = '/profile';
   static const String pinDetail = '/pin/:id';
+  static const String imageSearch = '/image-search';
   static const String settings = '/settings';
 }

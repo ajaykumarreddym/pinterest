@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:pinterest/features/auth/presentation/providers/auth_providers.dart';
 import 'package:pinterest/features/auth/presentation/views/onboarding_screen.dart';
+import 'package:pinterest/features/home/domain/entities/photo.dart';
 import 'package:pinterest/features/auth/presentation/views/login_screen.dart';
 import 'package:pinterest/features/auth/presentation/views/signup_screen.dart';
 import 'package:pinterest/features/auth/presentation/views/email_verification_screen.dart';
@@ -14,6 +15,7 @@ import 'package:pinterest/features/create/presentation/views/create_screen.dart'
 import 'package:pinterest/features/messages/presentation/views/messages_screen.dart';
 import 'package:pinterest/features/profile/presentation/views/profile_screen.dart';
 import 'package:pinterest/features/pin_detail/presentation/views/pin_detail_screen.dart';
+import 'package:pinterest/features/search/presentation/views/image_search_screen.dart';
 import 'package:pinterest/router/route_names.dart';
 import 'package:pinterest/router/shell_scaffold.dart';
 
@@ -127,6 +129,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final pinId = state.pathParameters['id'] ?? '';
           return PinDetailScreen(pinId: pinId);
+        },
+      ),
+
+      // Image search (visual search results)
+      GoRoute(
+        name: RouteNames.imageSearch,
+        path: RoutePaths.imageSearch,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final photo = state.extra! as Photo;
+          return ImageSearchScreen(photo: photo);
         },
       ),
     ],

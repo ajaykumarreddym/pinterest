@@ -3,27 +3,33 @@ import 'dart:math' as math;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:pinterest/core/design_systems/borders/app_borders.dart';
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
 import 'package:pinterest/core/extensions/string_ext.dart';
+import 'package:pinterest/core/services/social_share/share_service.dart';
+import 'package:pinterest/core/ui/atoms/app_toast.dart';
 import 'package:pinterest/features/home/domain/entities/photo.dart';
+import 'package:pinterest/features/home/presentation/providers/saved_pins_providers.dart';
 import 'package:pinterest/features/home/presentation/widgets/pin_long_press_overlay.dart';
+import 'package:pinterest/features/home/presentation/widgets/pin_options_bottom_sheet.dart';
 import 'package:pinterest/router/route_names.dart';
 
-class PinCard extends StatefulWidget {
+class PinCard extends ConsumerStatefulWidget {
   const PinCard({super.key, required this.photo});
 
   final Photo photo;
 
   @override
-  State<PinCard> createState() => _PinCardState();
+  ConsumerState<PinCard> createState() => _PinCardState();
 }
 
-class _PinCardState extends State<PinCard> {
+class _PinCardState extends ConsumerState<PinCard> {
   final _imageKey = GlobalKey();
 
   void _onLongPress([Offset? globalPressPosition]) {
@@ -54,24 +60,52 @@ class _PinCardState extends State<PinCard> {
         PinAction(
           icon: Icons.push_pin_outlined,
           label: 'Save',
-          onTap: () {},
+          onTap: () async {
+            final nowSaved = await ref
+                .read(savedPinsProvider.notifier)
+                .togglePin(widget.photo);
+            if (mounted) {
+              AppToast.success(
+                context,
+                message: nowSaved ? 'Pin saved' : 'Pin unsaved',
+              );
+            }
+          },
           iconRotation: math.pi / 4,
         ),
         PinAction(
           icon: Icons.share,
           label: 'Share',
-          onTap: () {},
+          onTap: () {
+            ref.read(shareServiceProvider).shareImage(
+                  imageUrl: widget.photo.src.medium,
+                  text: widget.photo.alt.isNotEmpty
+                      ? widget.photo.alt
+                      : 'Check out this pin!',
+                );
+          },
         ),
         PinAction(
           icon: Icons.image_search_rounded,
           label: 'Search image',
-          onTap: () {},
+          onTap: () {
+            context.push(RoutePaths.imageSearch, extra: widget.photo);
+          },
         ),
         PinAction(
           icon: null,
           svgAsset: 'assets/icons/whatsapp.svg',
           label: 'Send on WhatsApp',
-          onTap: () {},
+          onTap: () {
+            final text = widget.photo.alt.isNotEmpty
+                ? widget.photo.alt
+                : 'Check out this pin!';
+            final url = widget.photo.url;
+            final whatsappUrl = Uri.parse(
+              'https://wa.me/?text=${Uri.encodeComponent('$text\n$url')}',
+            );
+            launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+          },
         ),
       ],
     );
@@ -134,7 +168,10 @@ class _PinCardState extends State<PinCard> {
           Align(
             alignment: Alignment.centerRight,
             child: GestureDetector(
-              onTap: _onLongPress,
+              onTap: () => showPinOptionsBottomSheet(
+                context: context,
+                photo: widget.photo,
+              ),
               child: Padding(
                 padding: EdgeInsets.only(top: 4.h, right: 2.w),
                 child: Icon(

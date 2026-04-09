@@ -10,6 +10,7 @@ import 'package:pinterest/features/home/domain/entities/photo.dart';
 import 'package:pinterest/features/home/domain/usecases/get_curated_photos_usecase.dart';
 import 'package:pinterest/features/home/domain/usecases/search_photos_usecase.dart';
 import 'package:pinterest/features/home/presentation/providers/home_providers.dart';
+import 'package:pinterest/features/home/presentation/providers/pin_filter_service.dart';
 
 /// Manages home feed photo list with pagination (curated / "All" tab).
 class HomeNotifier extends AsyncNotifier<List<Photo>> {
@@ -47,7 +48,8 @@ class HomeNotifier extends AsyncNotifier<List<Photo>> {
         if (photos.length < AppConstants.defaultPageSize) {
           _hasMore = false;
         }
-        return photos;
+        final filtered = ref.read(pinFilterServiceProvider).filterPhotos(photos);
+        return filtered;
       },
     );
   }
@@ -204,7 +206,7 @@ class ForYouNotifier extends AsyncNotifier<List<Photo>> {
       '🔀 ForYou interleaved feed: ${interleaved.length} mixed photos',
     );
 
-    return interleaved;
+    return ref.read(pinFilterServiceProvider).filterPhotos(interleaved);
   }
 
   /// Shuffles elements within sliding windows of [windowSize] to add

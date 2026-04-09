@@ -9,6 +9,8 @@ import 'package:pinterest/features/localization/presentation/extensions/localiza
 import 'package:pinterest/core/design_systems/borders/app_borders.dart';
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
 import 'package:pinterest/features/home/domain/entities/photo.dart';
+import 'package:pinterest/features/home/presentation/providers/saved_pins_providers.dart';
+import 'package:pinterest/core/services/social_share/share_service.dart';
 import 'package:pinterest/features/home/presentation/widgets/pin_card.dart';
 import 'package:pinterest/features/pin_detail/presentation/providers/pin_detail_providers.dart';
 
@@ -174,14 +176,14 @@ class _PinDetailContent extends ConsumerWidget {
   }
 }
 
-class _PinImage extends StatelessWidget {
+class _PinImage extends ConsumerWidget {
   const _PinImage({required this.pinId, required this.photo});
 
   final String pinId;
   final Photo photo;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Stack(
       children: [
         // Rounded image
@@ -230,7 +232,14 @@ class _PinImage extends StatelessWidget {
           right: 16.w,
           child: _CircleButton(
             icon: Icons.share_outlined,
-            onTap: () {},
+            onTap: () {
+              ref.read(shareServiceProvider).shareImage(
+                    imageUrl: photo.src.medium,
+                    text: photo.alt.isNotEmpty
+                        ? photo.alt
+                        : 'Check out this pin!',
+                  );
+            },
           ),
         ),
       ],
@@ -238,19 +247,26 @@ class _PinImage extends StatelessWidget {
   }
 }
 
-class _ActionBar extends StatelessWidget {
+class _ActionBar extends ConsumerWidget {
   const _ActionBar({required this.photo});
 
   final Photo photo;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isSaved = ref.watch(isPinSavedProvider(photo.id));
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
         children: [
-          // Like
-          _ActionIcon(icon: Icons.favorite_border, onTap: () {}),
+          // Like / Save toggle
+          _ActionIcon(
+            icon: isSaved ? Icons.favorite : Icons.favorite_border,
+            color: isSaved ? const Color(0xFFE60023) : null,
+            onTap: () {
+              ref.read(savedPinsProvider.notifier).togglePin(photo);
+            },
+          ),
           SizedBox(width: 20.w),
           // Comment
           _ActionIcon(icon: Icons.chat_bubble_outline, onTap: () {}),
@@ -278,7 +294,9 @@ class _ActionBar extends StatelessWidget {
             ),
           // Save button
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              ref.read(savedPinsProvider.notifier).togglePin(photo);
+            },
             child: Container(
               padding: EdgeInsets.symmetric(
                 horizontal: 20.w,
@@ -400,10 +418,11 @@ class _CircleButton extends StatelessWidget {
 }
 
 class _ActionIcon extends StatelessWidget {
-  const _ActionIcon({required this.icon, required this.onTap});
+  const _ActionIcon({required this.icon, required this.onTap, this.color});
 
   final IconData icon;
   final VoidCallback onTap;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -411,7 +430,7 @@ class _ActionIcon extends StatelessWidget {
       onTap: onTap,
       child: Icon(
         icon,
-        color: AppColors.textPrimaryDark,
+        color: color ?? AppColors.textPrimaryDark,
         size: 24.sp,
       ),
     );
