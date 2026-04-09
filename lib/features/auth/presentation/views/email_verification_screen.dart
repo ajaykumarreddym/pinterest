@@ -215,7 +215,10 @@ class _EmailVerificationScreenState
       if (clerkAuth.isSignedIn && mounted) {
         // Complete auth in Riverpod
         final sessionToken = clerkAuth.session?.id ?? 'clerk_verified';
-        await ref.read(authProvider.notifier).markAuthenticated(sessionToken);
+        await ref.read(authProvider.notifier).markAuthenticated(
+          sessionToken,
+          context: context,
+        );
         AppLogger.info('✅ Email verified and signed in');
         // Router redirect will handle navigation to home
       }

@@ -58,12 +58,28 @@ class AuthNotifier extends Notifier<AuthStatus> {
 
   /// Update auth state from external callers (e.g. ClerkAuthentication widget,
   /// email verification screen).
-  Future<void> markAuthenticated(String sessionToken) async {
+  ///
+  /// Pass [context] when available so Clerk user data (name, email) is synced
+  /// to local storage for offline display.
+  Future<void> markAuthenticated(
+    String sessionToken, {
+    BuildContext? context,
+  }) async {
     final local = ref.read(authLocalDatasourceProvider);
     await local.cacheAuthToken(sessionToken);
     await local.setOnboardingComplete();
     state = AuthStatus.authenticated;
     AppLogger.info('✅ Auth state marked authenticated');
+
+    // Sync Clerk user data to local profile when context is available.
+    if (context != null) {
+      try {
+        final clerkAuth = ClerkAuth.of(context, listen: false);
+        _syncClerkUserToLocalProfile(clerkAuth);
+      } catch (_) {
+        // ClerkAuth not yet available in tree — skip sync.
+      }
+    }
   }
 
   /// Called after successful Clerk email/password sign-in.
@@ -384,6 +400,7 @@ class AuthNotifier extends Notifier<AuthStatus> {
         local.cacheAuthToken(sessionToken);
         local.setOnboardingComplete();
         state = AuthStatus.authenticated;
+        _syncClerkUserToLocalProfile(clerkAuth);
         AppLogger.info('🔄 Synced: Clerk signed in → authenticated');
       } else if (!clerkAuth.isSignedIn && state == AuthStatus.authenticated) {
         // Check if it's a guest session — don't sign out guests
@@ -431,6 +448,22 @@ class AuthNotifier extends Notifier<AuthStatus> {
 final authProvider = NotifierProvider<AuthNotifier, AuthStatus>(
   AuthNotifier.new,
 );
+
+/// Whether the authenticated user has already selected interest topics.
+/// The router watches this to decide if we redirect to the picks screen.
+final hasSelectedTopicsProvider = NotifierProvider<HasSelectedTopicsNotifier, bool>(
+  HasSelectedTopicsNotifier.new,
+);
+
+class HasSelectedTopicsNotifier extends Notifier<bool> {
+  @override
+  bool build() {
+    final ds = ref.read(userProfileDatasourceProvider);
+    return ds.getSelectedTopics().isNotEmpty;
+  }
+
+  void markSelected() => state = true;
+}
 
 /// Result of [AuthNotifier.createAccount].
 class CreateAccountResult {

@@ -266,7 +266,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
 
     final token = _sessionToken ?? 'signup_${DateTime.now().millisecondsSinceEpoch}';
-    await ref.read(authProvider.notifier).markAuthenticated(token);
+    await ref.read(authProvider.notifier).markAuthenticated(
+      token,
+      context: context,
+    );
     // Auth state update triggers router redirect to home.
   }
 

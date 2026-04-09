@@ -29,6 +29,7 @@ class RouteNames {
   // Settings
   static const String settings = 'settings';
   static const String account = 'account';
+  static const String refineRecommendations = 'refineRecommendations';
 }
 
 /// Route path constants.
@@ -51,5 +52,6 @@ class RoutePaths {
   static const String searchResults = '/search-results';
   static const String settings = '/settings';
   static const String account = '/account';
+  static const String refineRecommendations = '/refine-recommendations';
   static const String chatDetail = '/chat/:conversationId';
 }

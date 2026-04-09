@@ -46,7 +46,7 @@ class _ClerkAuthScreenState extends ConsumerState<ClerkAuthScreen> {
       final notifier = ref.read(authProvider.notifier);
       if (ref.read(authProvider) != AuthStatus.authenticated) {
         final sessionToken = clerkAuth.session?.id ?? 'clerk_auth_widget';
-        await notifier.markAuthenticated(sessionToken);
+        await notifier.markAuthenticated(sessionToken, context: context);
         AppLogger.info('✅ Clerk auth widget → authenticated');
       }
     });

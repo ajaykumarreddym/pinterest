@@ -41,12 +41,12 @@ class AccountScreen extends ConsumerWidget {
         : (localProfile?.name?.isNotEmpty == true
             ? localProfile!.name!
             : 'Guest');
-    final email = user?.email;
-    final username = user?.username ??
-        (email != null ? '@${email.split('@').first}' : null) ??
-        (localProfile?.email != null
-            ? '@${localProfile!.email!.split('@').first}'
+    final email = user?.email ??
+        (localProfile?.email?.isNotEmpty == true
+            ? localProfile!.email
             : null);
+    final username = user?.username ??
+        (email != null ? '@${email.split('@').first}' : null);
     final avatarUrl = user?.imageUrl;
     final hasAvatar = user?.hasImage == true && avatarUrl != null;
     final initials = _getInitials(displayName);

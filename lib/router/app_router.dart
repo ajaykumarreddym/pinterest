@@ -22,6 +22,7 @@ import 'package:pinterest/features/search/presentation/views/search_results_scre
 import 'package:pinterest/features/search/presentation/views/video_detail_screen.dart';
 import 'package:pinterest/features/search/domain/entities/search_video.dart';
 import 'package:pinterest/features/settings/presentation/views/account_screen.dart';
+import 'package:pinterest/features/settings/presentation/views/refine_recommendations_screen.dart';
 import 'package:pinterest/router/route_names.dart';
 import 'package:pinterest/router/shell_scaffold.dart';
 
@@ -30,6 +31,7 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authStatus = ref.watch(authProvider);
+  final hasTopics = ref.watch(hasSelectedTopicsProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -42,12 +44,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           state.matchedLocation == RoutePaths.signUp ||
           state.matchedLocation == RoutePaths.emailVerification ||
           state.matchedLocation == RoutePaths.clerkAuth;
-
-      // Authenticated → redirect away from auth pages to home
-      if (isAuth && isOnAuthPage) return RoutePaths.home;
+      final isOnPicksPage =
+          state.matchedLocation == RoutePaths.refineRecommendations;
 
       // Not authenticated → redirect from protected pages to onboarding
       if (!isAuth && !isOnAuthPage) return RoutePaths.onboarding;
+
+      if (isAuth) {
+        // No topics selected → send to refine recommendations
+        if (!hasTopics) {
+          if (!isOnPicksPage) return RoutePaths.refineRecommendations;
+          return null;
+        }
+
+        // Has topics → redirect away from auth / picks pages to home
+        if (isOnAuthPage || isOnPicksPage) return RoutePaths.home;
+      }
 
       return null; // no redirect needed
     },
@@ -83,6 +95,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: RouteNames.clerkAuth,
         path: RoutePaths.clerkAuth,
         builder: (context, state) => const ClerkAuthScreen(),
+      ),
+
+      // Post-login topic picks
+      GoRoute(
+        name: RouteNames.refineRecommendations,
+        path: RoutePaths.refineRecommendations,
+        builder: (context, state) =>
+            const RefineRecommendationsScreen(isPostLogin: true),
       ),
 
       // Main shell with bottom navigation

@@ -11,7 +11,14 @@ import 'package:pinterest/features/auth/presentation/providers/auth_providers.da
 
 /// Refine recommendations — select/deselect interest topics.
 class RefineRecommendationsScreen extends ConsumerStatefulWidget {
-  const RefineRecommendationsScreen({super.key});
+  const RefineRecommendationsScreen({
+    super.key,
+    this.isPostLogin = false,
+  });
+
+  /// When true, saving topics will trigger the router to redirect to home
+  /// instead of popping the current screen.
+  final bool isPostLogin;
 
   @override
   ConsumerState<RefineRecommendationsScreen> createState() =>
@@ -57,7 +64,13 @@ class _RefineRecommendationsScreenState
             const UserProfile())
         .copyWith(selectedTopics: _selected.toList());
     await ds.saveProfile(updated);
-    if (mounted) {
+
+    if (!mounted) return;
+
+    if (widget.isPostLogin) {
+      // Update the provider so the router redirects to home.
+      ref.read(hasSelectedTopicsProvider.notifier).markSelected();
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Preferences saved'),
@@ -78,26 +91,29 @@ class _RefineRecommendationsScreenState
         backgroundColor: AppColors.backgroundDark,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: AppColors.textPrimaryDark,
-            size: 20.sp,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        automaticallyImplyLeading: !widget.isPostLogin,
+        leading: widget.isPostLogin
+            ? null
+            : IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new,
+                  color: AppColors.textPrimaryDark,
+                  size: 20.sp,
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
         centerTitle: true,
         title: Text(
-          'Refine recommendations',
+          widget.isPostLogin ? 'Pick your interests' : 'Refine recommendations',
           style: AppTypography.labelLarge.copyWith(
             color: AppColors.textPrimaryDark,
           ),
         ),
         actions: [
           TextButton(
-            onPressed: _save,
+            onPressed: _selected.isNotEmpty ? _save : null,
             child: Text(
-              'Save',
+              widget.isPostLogin ? 'Continue' : 'Save',
               style: AppTypography.labelMedium.copyWith(
                 color: AppColors.pinterestRed,
               ),
