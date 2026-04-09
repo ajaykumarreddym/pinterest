@@ -155,7 +155,7 @@ class _PinOptionsSheet extends ConsumerWidget {
                 onTap: () async {
                   await ref
                       .read(pinFilterServiceProvider)
-                      .hidePin(photo.id);
+                      .hidePin(photo.id, imageUrl: photo.src.medium);
                   ref.invalidate(homePhotosProvider);
                   ref.invalidate(forYouPhotosProvider);
                   if (context.mounted) {
@@ -177,7 +177,7 @@ class _PinOptionsSheet extends ConsumerWidget {
                 onTap: () async {
                   await ref
                       .read(pinFilterServiceProvider)
-                      .reportPin(photo.id);
+                      .reportPin(photo.id, imageUrl: photo.src.medium);
                   ref.invalidate(homePhotosProvider);
                   ref.invalidate(forYouPhotosProvider);
                   if (context.mounted) {

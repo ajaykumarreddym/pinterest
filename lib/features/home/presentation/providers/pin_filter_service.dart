@@ -17,20 +17,36 @@ class PinFilterService {
 
   final AppStorage storage;
 
+  static const _separator = '|';
+
   // ── Reported ──
 
   Set<int> _reportedIds() {
     final list = storage.getStringList(StorageKeys.reportedPinIds);
     if (list == null) return {};
-    return list.map(int.parse).toSet();
+    return list.map((e) => int.parse(e.split(_separator).first)).toSet();
   }
 
-  Future<void> reportPin(int photoId) async {
-    final ids = _reportedIds();
-    ids.add(photoId);
+  /// Returns a map of reported pin ID → image URL.
+  Map<int, String> getReportedPins() {
+    final list = storage.getStringList(StorageKeys.reportedPinIds);
+    if (list == null) return {};
+    final map = <int, String>{};
+    for (final entry in list) {
+      final parts = entry.split(_separator);
+      final id = int.parse(parts.first);
+      final imageUrl = parts.length > 1 ? parts.sublist(1).join(_separator) : '';
+      map[id] = imageUrl;
+    }
+    return map;
+  }
+
+  Future<void> reportPin(int photoId, {String imageUrl = ''}) async {
+    final pins = getReportedPins();
+    pins[photoId] = imageUrl;
     await storage.setStringList(
       StorageKeys.reportedPinIds,
-      ids.map((e) => e.toString()).toList(),
+      pins.entries.map((e) => '${e.key}$_separator${e.value}').toList(),
     );
     AppLogger.info('🚫 Pin $photoId reported');
   }
@@ -44,15 +60,29 @@ class PinFilterService {
   Set<int> _hiddenIds() {
     final list = storage.getStringList(StorageKeys.hiddenPinIds);
     if (list == null) return {};
-    return list.map(int.parse).toSet();
+    return list.map((e) => int.parse(e.split(_separator).first)).toSet();
   }
 
-  Future<void> hidePin(int photoId) async {
-    final ids = _hiddenIds();
-    ids.add(photoId);
+  /// Returns a map of hidden pin ID → image URL.
+  Map<int, String> getHiddenPins() {
+    final list = storage.getStringList(StorageKeys.hiddenPinIds);
+    if (list == null) return {};
+    final map = <int, String>{};
+    for (final entry in list) {
+      final parts = entry.split(_separator);
+      final id = int.parse(parts.first);
+      final imageUrl = parts.length > 1 ? parts.sublist(1).join(_separator) : '';
+      map[id] = imageUrl;
+    }
+    return map;
+  }
+
+  Future<void> hidePin(int photoId, {String imageUrl = ''}) async {
+    final pins = getHiddenPins();
+    pins[photoId] = imageUrl;
     await storage.setStringList(
       StorageKeys.hiddenPinIds,
-      ids.map((e) => e.toString()).toList(),
+      pins.entries.map((e) => '${e.key}$_separator${e.value}').toList(),
     );
     AppLogger.info('👁️ Pin $photoId hidden (not interested)');
   }

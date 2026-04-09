@@ -4,7 +4,94 @@ A **pixel-perfect Pinterest clone** built with Flutter, replicating the official
 
 ## Screenshots
 
-<!-- Add screenshots here -->
+### Authentication Flow
+
+| Welcome Screen | Login Screen |
+|:-:|:-:|
+| <img src="assets/app_screeshots/01_welcome_screen.jpeg" width="300"/> | <img src="assets/app_screeshots/02_login_screen.jpeg" width="300"/> |
+
+**Welcome Screen** — Animated photo collage background with the Pinterest logo, red "Sign up" CTA, and gray "Log in" button. Terms of Service and Privacy Policy links at the bottom.
+
+**Login Screen** — "Continue with Google" SSO button at the top, followed by an "OR" divider, email/password fields with visibility toggle, "Log in" button, and "Forgotten your password?" link.
+
+---
+
+### Home Feed
+
+| Home Feed — "For you" Tab |
+|:-:|
+| <img src="assets/app_screeshots/03_home_feed_for_you.jpeg" width="300"/> |
+
+**Home Feed** — 2-column masonry grid layout with variable-height pin cards (16px rounded corners). The "For you" tab shows personalized content. Each pin card has a `···` options menu. A tune/filter icon sits in the top-right corner. Bottom navigation bar: Home (active), Search, Create (+), Messages, Profile.
+
+---
+
+### Search & Explore
+
+| Search / Explore | Search Results |
+|:-:|:-:|
+| <img src="assets/app_screeshots/04_search_explore.jpeg" width="300"/> | <img src="assets/app_screeshots/05_search_results.jpeg" width="300"/> |
+
+**Search / Explore** — "Search for ideas" search bar at top. Below it, a full-width "Per your taste" recommendation carousel with pagination dots. "Explore featured boards" section with horizontally scrollable board cards showing category labels (e.g., "European summer aesthetic — Travel").
+
+**Search Results** — Back arrow + search input with the query. Horizontal scrollable category chips with thumbnail previews (Cute, Sketches, Ideas). Filter icon on the right. Results displayed in the standard 2-column masonry grid with `···` options on each pin.
+
+---
+
+### Messages
+
+| Messages Screen |
+|:-:|
+| <img src="assets/app_screeshots/06_messages.jpeg" width="300"/> |
+
+**Messages** — Tab bar with "Updates" and "Messages" (active, pill-shaped). Filter icon on the right. "New message" compose bar at top. Conversation list with circular avatars, sender name, message preview, timestamp, and red unread count badges. Divider lines between conversations.
+
+---
+
+### Profile
+
+| Profile — Saved Pins | Create Bottom Sheet |
+|:-:|:-:|
+| <img src="assets/app_screeshots/07_profile_pins.jpeg" width="300"/> | <img src="assets/app_screeshots/08_create_bottom_sheet.jpeg" width="300"/> |
+
+**Profile — Saved Pins** — Red circular avatar with initial letter at top-left. Tabs: Pins (active, underlined), Boards, Collages. Filter chips: grid-view icon, "Favourites" (star), "Created by you". Saved pins displayed in a compact grid. Green "Pin saved" toast/snackbar at the bottom.
+
+**Create Bottom Sheet** — Modal bottom sheet triggered from the "+" button. Title: "Start creating now". Three options with icons: Pin, Collage, Board. Dismissible via the "✕" button.
+
+---
+
+### Settings & Preferences
+
+| Account Settings | Refine Recommendations |
+|:-:|:-:|
+| <img src="assets/app_screeshots/09_account_settings.jpeg" width="300"/> | <img src="assets/app_screeshots/10_refine_recommendations.jpeg" width="300"/> |
+
+**Account Settings** — Full-screen list view with back arrow and "Your account" title. Sections: Settings (Account management, Profile visibility, Refine your recommendations, Claimed external accounts, Social permissions, Notifications, Privacy and data, Reports and violations centre) and Login (Add account, Security, Log out). Each row has a right-chevron indicator.
+
+**Refine Recommendations** — Back arrow, title, "Done" button. Tab bar: Your top picks (active, underlined), Interests, Reported, See less. Subheading: "Select topics to personalise your feed" with selected count. 3-column grid of topic cards with thumbnail images and labels (Cute greetings, Photography, Cute animals, Small spaces, Plants, Home renovation, etc.). Green highlight border on selected topics.
+
+---
+
+### UI Reference Summary (for Developers)
+
+| Element | Specification |
+|---|---|
+| **Theme** | Dark — black `#000000` background, dark gray `#1A1A1A` surfaces |
+| **Accent Color** | Pinterest Red `#E60023` (CTAs, badges, active indicators) |
+| **Grid Layout** | 2-column masonry (`MasonryGridView.count`), ~4px gap |
+| **Card Corners** | 16px (`BorderRadius.circular(16.r)`) |
+| **Bottom Nav** | 5 items: Home, Search, Create (+), Messages, Profile |
+| **Bottom Nav Style** | Icon-only, no labels, active = filled, inactive = outlined |
+| **Search Bar** | Rounded pill shape, gray background, search icon left |
+| **Chips/Filters** | Rounded pill, dark gray bg, white text, horizontal scroll |
+| **Avatars** | Circular, 48px for conversation list, 40px for profile |
+| **Toast/Snackbar** | Green background, white text, checkmark icon, bottom-positioned |
+| **Bottom Sheet** | White background, rounded top corners, 3-column icon grid |
+| **Settings Rows** | Full-width, title left, chevron right, divider between rows |
+| **Tab Indicators** | White text, underline on active tab |
+| **Unread Badges** | Red circle with white count text |
+| **Typography** | Bold for names/titles, regular for descriptions, gray for timestamps |
+| **Animations** | Hero transitions (pin tap → detail), shimmer loading, collage animation on welcome |
 
 ## Tech Stack
 
