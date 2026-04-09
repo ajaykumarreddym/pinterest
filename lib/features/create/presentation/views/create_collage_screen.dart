@@ -189,6 +189,8 @@ class _CreateCollageScreenState extends ConsumerState<CreateCollageScreen> {
           hintStyle: AppTypography.h3.copyWith(
             color: AppColors.textTertiaryDark,
           ),
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
           filled: false,
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(vertical: AppSpacing.space3),

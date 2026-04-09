@@ -94,8 +94,7 @@ class _CreateBoardScreenState extends ConsumerState<CreateBoardScreen> {
             _buildNameField(),
             Divider(color: AppColors.dividerDark, height: AppSpacing.space7),
             _buildDescriptionField(),
-            Divider(color: AppColors.dividerDark, height: AppSpacing.space7),
-            _buildSecretToggle(),
+           
           ],
         ),
       ),
@@ -252,6 +251,8 @@ class _CreateBoardScreenState extends ConsumerState<CreateBoardScreen> {
                 color: AppColors.textTertiaryDark,
               ),
               filled: false,
+              enabledBorder: InputBorder.none,
+             focusedBorder: InputBorder.none,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
             ),
@@ -293,43 +294,12 @@ class _CreateBoardScreenState extends ConsumerState<CreateBoardScreen> {
                 color: AppColors.textTertiaryDark,
               ),
               filled: false,
+              enabledBorder: InputBorder.none,
+             focusedBorder: InputBorder.none,
               border: InputBorder.none,
               contentPadding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSecretToggle() {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Keep this board secret',
-                style: AppTypography.labelMedium.copyWith(
-                  color: AppColors.textPrimaryDark,
-                ),
-              ),
-              SizedBox(height: AppSpacing.space1),
-              Text(
-                'Only you and collaborators can see it',
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textTertiaryDark,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Switch.adaptive(
-          value: _isSecret,
-          onChanged: (v) => setState(() => _isSecret = v),
-          activeColor: AppColors.pinterestRed,
-          inactiveTrackColor: AppColors.surfaceVariantDark,
         ),
       ],
     );

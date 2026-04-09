@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:pinterest/core/design_systems/borders/app_borders.dart';
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
@@ -46,7 +47,11 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(searchQueryProvider.notifier).state = widget.initialQuery;
-      ref.read(searchPhotosProvider.notifier).search(widget.initialQuery);
+      if (widget.initialQuery.isNotEmpty) {
+        ref.read(searchPhotosProvider.notifier).search(widget.initialQuery);
+      } else {
+        _focusNode.requestFocus();
+      }
     });
   }
 
@@ -105,7 +110,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                 children: [
                   // Back button
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => context.pop(),
                     child: Icon(
                       Icons.arrow_back,
                       color: AppColors.textPrimaryDark,
@@ -120,10 +125,6 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                       decoration: BoxDecoration(
                         color: AppColors.surfaceVariantDark,
                         borderRadius: AppBorders.searchBar,
-                        border: Border.all(
-                          color: AppColors.textTertiaryDark,
-                          width: 1.w,
-                        ),
                       ),
                       child: Row(
                         children: [
@@ -136,12 +137,15 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                               style: AppTypography.bodyLarge.copyWith(
                                 color: AppColors.textPrimaryDark,
                               ),
+                              
                               decoration: InputDecoration(
                                 hintText:
                                     context.tr('search.searchForIdeas'),
                                 hintStyle: AppTypography.bodyLarge.copyWith(
                                   color: AppColors.textTertiaryDark,
                                 ),
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.zero,
                                 isDense: true,

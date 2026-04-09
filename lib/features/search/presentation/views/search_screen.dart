@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'package:pinterest/core/design_systems/borders/app_borders.dart';
@@ -10,10 +11,11 @@ import 'package:pinterest/core/design_systems/typography/app_typography.dart';
 import 'package:pinterest/features/localization/presentation/extensions/localization_extension.dart';
 import 'package:pinterest/features/search/presentation/providers/search_explore_notifier.dart';
 import 'package:pinterest/features/search/presentation/providers/search_providers.dart';
-import 'package:pinterest/features/search/presentation/views/search_results_screen.dart';
 import 'package:pinterest/features/search/presentation/widgets/featured_board_card.dart';
 import 'package:pinterest/features/search/presentation/widgets/popular_category_section.dart';
 import 'package:pinterest/features/search/presentation/widgets/taste_carousel.dart';
+import 'package:pinterest/features/search/presentation/widgets/camera_search.dart';
+import 'package:pinterest/router/route_names.dart';
 
 /// Pinterest search home / explore screen.
 ///
@@ -32,12 +34,21 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
   bool get wantKeepAlive => true;
 
   void _navigateToResults(String query) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SearchResultsScreen(initialQuery: query),
-      ),
+    context.push(
+      '${RoutePaths.searchResults}?q=${Uri.encodeComponent(query)}',
     );
+  }
+
+  Future<void> _onCameraSearch() async {
+    final imagePath = await CameraSearchService.pickSearchImage(context);
+    if (imagePath != null && mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute<void>(
+          builder: (_) => CameraSearchResultsScreen(imagePath: imagePath),
+        ),
+      );
+    }
   }
 
   @override
@@ -53,6 +64,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
             // Search bar (tappable, navigates to results)
             _SearchBarTappable(
               onTap: () => _navigateToResults(''),
+           
             ),
             // Explore content
             Expanded(
@@ -77,9 +89,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
 
 /// Tappable search bar that navigates to the search results screen.
 class _SearchBarTappable extends StatelessWidget {
-  const _SearchBarTappable({required this.onTap});
+  const _SearchBarTappable({
+    required this.onTap,
+
+  });
 
   final VoidCallback onTap;
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -92,10 +108,6 @@ class _SearchBarTappable extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.surfaceVariantDark,
             borderRadius: AppBorders.searchBar,
-            border: Border.all(
-              color: AppColors.textTertiaryDark,
-              width: 1.w,
-            ),
           ),
           child: Row(
             children: [
@@ -114,8 +126,6 @@ class _SearchBarTappable extends StatelessWidget {
                   ),
                 ),
               ),
-            
-              SizedBox(width: AppSpacing.space5),
             ],
           ),
         ),

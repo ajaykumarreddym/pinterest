@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +12,8 @@ import 'package:pinterest/core/ui/atoms/app_button.dart';
 import 'package:pinterest/features/auth/presentation/widgets/login_bottom_sheet.dart';
 import 'package:pinterest/features/auth/presentation/widgets/welcome_collage.dart';
 import 'package:pinterest/features/localization/presentation/extensions/localization_extension.dart';
+import 'package:pinterest/features/settings/presentation/views/privacy_policy_screen.dart';
+import 'package:pinterest/features/settings/presentation/views/terms_of_service_screen.dart';
 import 'package:pinterest/router/route_names.dart';
 
 /// Pinterest welcome / landing screen.
@@ -147,7 +150,39 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 }
 
-class _TermsText extends StatelessWidget {
+class _TermsText extends StatefulWidget {
+  @override
+  State<_TermsText> createState() => _TermsTextState();
+}
+
+class _TermsTextState extends State<_TermsText> {
+  late final TapGestureRecognizer _termsRecognizer;
+  late final TapGestureRecognizer _privacyRecognizer;
+
+  @override
+  void initState() {
+    super.initState();
+    _termsRecognizer = TapGestureRecognizer()
+      ..onTap = () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const TermsOfServiceScreen(),
+            ),
+          );
+    _privacyRecognizer = TapGestureRecognizer()
+      ..onTap = () => Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (_) => const PrivacyPolicyScreen(),
+            ),
+          );
+  }
+
+  @override
+  void dispose() {
+    _termsRecognizer.dispose();
+    _privacyRecognizer.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final baseStyle = TextStyle(
@@ -167,10 +202,18 @@ class _TermsText extends StatelessWidget {
             text: "By continuing, you agree to Pinterest's ",
             style: baseStyle,
           ),
-          TextSpan(text: 'Terms of Service', style: linkStyle),
+          TextSpan(
+            text: 'Terms of Service',
+            style: linkStyle,
+            recognizer: _termsRecognizer,
+          ),
           TextSpan(text: ' and acknowledge\n ', style: baseStyle),
           TextSpan(text: "you've read our ", style: baseStyle),
-          TextSpan(text: 'Privacy Policy', style: linkStyle),
+          TextSpan(
+            text: 'Privacy Policy',
+            style: linkStyle,
+            recognizer: _privacyRecognizer,
+          ),
           TextSpan(text: '. ', style: baseStyle),
           TextSpan(text: 'Notice at Collection', style: linkStyle),
           TextSpan(text: '.', style: baseStyle),

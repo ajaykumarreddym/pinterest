@@ -1,3 +1,4 @@
+import 'package:clerk_flutter/clerk_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -238,14 +239,31 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   Future<void> _completeSignUp() async {
     // Save user profile locally for personalised feed.
+    final name = _nameController.text.trim();
     final profile = UserProfile(
-      name: _nameController.text.trim(),
+      name: name,
       email: _emailController.text.trim(),
       dateOfBirth: _selectedBirthdate.toIso8601String(),
       gender: _selectedGender,
       selectedTopics: _selectedTopicCategories,
     );
     await ref.read(userProfileDatasourceProvider).saveProfile(profile);
+
+    // Push name to Clerk so it persists across devices/sessions.
+    if (name.isNotEmpty && mounted) {
+      try {
+        final clerkAuth = ClerkAuth.of(context, listen: false);
+        final parts = name.split(' ');
+        final firstName = parts.first;
+        final lastName = parts.length > 1 ? parts.sublist(1).join(' ') : null;
+        await clerkAuth.updateUser(
+          firstName: firstName,
+          lastName: lastName,
+        );
+      } catch (_) {
+        // Non-critical: name saved locally, Clerk update is best-effort.
+      }
+    }
 
     final token = _sessionToken ?? 'signup_${DateTime.now().millisecondsSinceEpoch}';
     await ref.read(authProvider.notifier).markAuthenticated(token);

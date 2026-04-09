@@ -8,6 +8,7 @@ import 'package:pinterest/core/utils/app_logger.dart';
 import 'package:pinterest/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:pinterest/features/auth/data/datasources/user_profile_datasource.dart';
 import 'package:pinterest/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:pinterest/features/auth/domain/entities/user_profile.dart';
 import 'package:pinterest/features/auth/domain/repositories/auth_repository.dart';
 
 // ─── Datasources ────────────────────────────────────────────────
@@ -148,6 +149,7 @@ class AuthNotifier extends Notifier<AuthStatus> {
   Future<void> _completeLogin(ClerkAuthState clerkAuth) async {
     final sessionToken = clerkAuth.session?.id ?? 'clerk_session';
     await _completeLoginWithToken(sessionToken);
+    _syncClerkUserToLocalProfile(clerkAuth);
     AppLogger.info('✅ User signed in via Clerk (email/password)');
   }
 
@@ -156,6 +158,36 @@ class AuthNotifier extends Notifier<AuthStatus> {
     await local.cacheAuthToken(token);
     await local.setOnboardingComplete();
     state = AuthStatus.authenticated;
+  }
+
+  /// Syncs Clerk user data (name, email) to local [UserProfile] so the
+  /// profile screen works even without live Clerk context.
+  void _syncClerkUserToLocalProfile(ClerkAuthState clerkAuth) {
+    try {
+      final clerkUser = clerkAuth.user;
+      if (clerkUser == null) return;
+
+      final name = [clerkUser.firstName, clerkUser.lastName]
+          .where((s) => s != null && s.isNotEmpty)
+          .join(' ');
+
+      final primaryEmail = clerkUser.emailAddresses
+          ?.where((e) => e.id == clerkUser.primaryEmailAddressId)
+          .firstOrNull
+          ?.emailAddress;
+
+      final datasource = ref.read(userProfileDatasourceProvider);
+      final existing = datasource.getProfile();
+      final updated = (existing ?? const UserProfile()).copyWith(
+        name: name.isNotEmpty ? name : existing?.name,
+        email: primaryEmail?.isNotEmpty == true
+            ? primaryEmail
+            : existing?.email,
+      );
+      datasource.saveProfile(updated);
+    } catch (e) {
+      AppLogger.error('Failed to sync Clerk user to local profile', error: e);
+    }
   }
 
   /// Initiates a password reset flow via Clerk.
@@ -324,6 +356,7 @@ class AuthNotifier extends Notifier<AuthStatus> {
       await local.cacheAuthToken(sessionToken);
       await local.setOnboardingComplete();
       state = AuthStatus.authenticated;
+      _syncClerkUserToLocalProfile(clerkAuth);
       AppLogger.info('✅ User signed in via Clerk (Google SSO)');
     } else {
       AppLogger.info('⚠️ Google SSO flow cancelled or did not complete');

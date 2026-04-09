@@ -10,10 +10,9 @@ import 'package:pinterest/core/design_systems/borders/app_borders.dart';
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
 import 'package:pinterest/features/home/domain/entities/photo.dart';
 import 'package:pinterest/features/home/presentation/providers/saved_pins_providers.dart';
-import 'package:pinterest/features/home/presentation/widgets/pin_options_bottom_sheet.dart';
 import 'package:pinterest/core/services/social_share/share_service.dart';
 import 'package:pinterest/features/home/presentation/widgets/pin_card.dart';
-import 'package:pinterest/features/pin_detail/presentation/providers/liked_pins_provider.dart';
+import 'package:pinterest/features/home/presentation/widgets/pin_options_bottom_sheet.dart';
 import 'package:pinterest/features/pin_detail/presentation/providers/pin_detail_providers.dart';
 
 /// Pin detail screen showing full image, actions, and related pins.
@@ -257,41 +256,27 @@ class _ActionBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isSaved = ref.watch(isPinSavedProvider(photo.id));
-    final isLiked = ref.watch(isPinLikedProvider(photo.id));
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
         children: [
-          // Like toggle
+          // Like / Save toggle
           _ActionIcon(
-            icon: isLiked ? Icons.favorite : Icons.favorite_border,
-            color: isLiked ? const Color(0xFFE60023) : null,
+            icon: isSaved ? Icons.favorite : Icons.favorite_border,
+            color: isSaved ? const Color(0xFFE60023) : null,
             onTap: () {
-              ref.read(likedPinsProvider.notifier).toggleLike(photo.id);
+              ref.read(savedPinsProvider.notifier).togglePin(photo);
             },
           ),
           SizedBox(width: 20.w),
-          // Share
-          _ActionIcon(
-            icon: Icons.share_outlined,
-            onTap: () {
-              ref.read(shareServiceProvider).shareImage(
-                    imageUrl: photo.src.medium,
-                    text: photo.alt.isNotEmpty
-                        ? photo.alt
-                        : 'Check out this pin!',
-                  );
-            },
-          ),
           SizedBox(width: 20.w),
-          // Comment
-         
-          // More options — opens bottom sheet
+          // More options
           _ActionIcon(
             icon: Icons.more_horiz,
-            onTap: () {
-              showPinOptionsBottomSheet(context: context, photo: photo);
-            },
+            onTap: () => showPinOptionsBottomSheet(
+              context: context,
+              photo: photo,
+            ),
           ),
           const Spacer(),
           // Save button
@@ -301,22 +286,18 @@ class _ActionBar extends ConsumerWidget {
             },
             child: Container(
               padding: EdgeInsets.symmetric(
-                horizontal: 14.w,
-                vertical: 8.h,
+                horizontal: 20.w,
+                vertical: 10.h,
               ),
               decoration: BoxDecoration(
-                color: isSaved
-                    ? AppColors.surfaceVariantDark
-                    : AppColors.pinterestRed,
+                color: AppColors.pinterestRed,
                 borderRadius: AppBorders.button,
               ),
               child: Text(
-                isSaved
-                    ? context.tr('general.saved')
-                    : context.tr('general.save'),
+                context.tr('general.save'),
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 13.sp,
+                  fontSize: 15.sp,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -339,9 +320,9 @@ class _PhotographerRow extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
         children: [
-          // Avatar — small
+          // Avatar
           CircleAvatar(
-            radius: 14.r,
+            radius: 18.r,
             backgroundColor: AppColors.surfaceVariantDark,
             child: Text(
               photo.photographer.isNotEmpty
@@ -349,13 +330,13 @@ class _PhotographerRow extends StatelessWidget {
                   : '?',
               style: TextStyle(
                 color: AppColors.textPrimaryDark,
-                fontSize: 11.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          SizedBox(width: 8.w),
-          // Name — smaller text
+          SizedBox(width: 10.w),
+          // Name
           Expanded(
             child: Text(
               photo.photographer,
@@ -363,211 +344,12 @@ class _PhotographerRow extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: AppColors.textPrimaryDark,
-                fontSize: 13.sp,
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
 
-// ─────────────────────────────────────────────────────────
-// Comment bottom sheet
-// ─────────────────────────────────────────────────────────
-
-void _showCommentSheet(BuildContext context, Photo photo) {
-  showModalBottomSheet<void>(
-    context: context,
-    backgroundColor: Colors.transparent,
-    isScrollControlled: true,
-    useRootNavigator: true,
-    builder: (_) => _CommentSheet(photo: photo),
-  );
-}
-
-class _CommentSheet extends StatefulWidget {
-  const _CommentSheet({required this.photo});
-
-  final Photo photo;
-
-  @override
-  State<_CommentSheet> createState() => _CommentSheetState();
-}
-
-class _CommentSheetState extends State<_CommentSheet> {
-  final _controller = TextEditingController();
-  final _comments = <String>[];
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _addComment() {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-    setState(() {
-      _comments.insert(0, text);
-    });
-    _controller.clear();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-
-    return Container(
-      height: MediaQuery.sizeOf(context).height * 0.6,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariantDark,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-      ),
-      child: Column(
-        children: [
-          // Handle
-          Padding(
-            padding: EdgeInsets.only(top: 10.h, bottom: 8.h),
-            child: Container(
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: AppColors.textTertiaryDark,
-                borderRadius: BorderRadius.circular(2.r),
-              ),
-            ),
-          ),
-          Text(
-            'Comments',
-            style: TextStyle(
-              color: AppColors.textPrimaryDark,
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Divider(color: AppColors.dividerDark, height: 1),
-          Expanded(
-            child: _comments.isEmpty
-                ? Center(
-                    child: Text(
-                      'No comments yet',
-                      style: TextStyle(
-                        color: AppColors.textTertiaryDark,
-                        fontSize: 14.sp,
-                      ),
-                    ),
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 12.h,
-                    ),
-                    itemCount: _comments.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(bottom: 12.h),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 14.r,
-                              backgroundColor: AppColors.backgroundDark,
-                              child: Icon(
-                                Icons.person,
-                                size: 16.sp,
-                                color: AppColors.textTertiaryDark,
-                              ),
-                            ),
-                            SizedBox(width: 10.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'You',
-                                    style: TextStyle(
-                                      color: AppColors.textPrimaryDark,
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  SizedBox(height: 2.h),
-                                  Text(
-                                    _comments[index],
-                                    style: TextStyle(
-                                      color: AppColors.textSecondaryDark,
-                                      fontSize: 13.sp,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              12.w,
-              8.h,
-              12.w,
-              bottomInset + 12.h,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 14.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundDark,
-                      borderRadius: BorderRadius.circular(24.r),
-                    ),
-                    child: TextField(
-                      controller: _controller,
-                      style: TextStyle(
-                        color: AppColors.textPrimaryDark,
-                        fontSize: 14.sp,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: 'Add a comment...',
-                        hintStyle: TextStyle(
-                          color: AppColors.textTertiaryDark,
-                          fontSize: 14.sp,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10.h),
-                      ),
-                      textInputAction: TextInputAction.send,
-                      onSubmitted: (_) => _addComment(),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8.w),
-                GestureDetector(
-                  onTap: _addComment,
-                  child: Container(
-                    width: 36.w,
-                    height: 36.w,
-                    decoration: const BoxDecoration(
-                      color: AppColors.pinterestRed,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.arrow_upward_rounded,
-                      color: Colors.white,
-                      size: 20.sp,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
