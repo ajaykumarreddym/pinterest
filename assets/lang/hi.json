@@ -49,7 +49,15 @@
   },
   "home": {
     "all": "सभी",
-    "forYou": "आपके लिए"
+    "forYou": "आपके लिए",
+    "refineRecommendations": "अपनी सिफारिशें परिष्कृत करें",
+    "tabPins": "पिन",
+    "tabInterests": "रुचियां",
+    "tabReported": "रिपोर्ट किया",
+    "tabSeeLess": "कम देखें",
+    "noPinsSaved": "आपने अभी तक कोई पिन सहेजा नहीं है",
+    "noReportedPins": "आपने कोई पिन रिपोर्ट नहीं किया है",
+    "noHiddenPins": "कोई छिपे हुए पिन नहीं"
   },
   "auth": {
     "onboardingTagline": "अपनी पसंद की\nज़िंदगी बनाएं",

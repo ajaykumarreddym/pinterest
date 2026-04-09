@@ -268,29 +268,6 @@ class _CollapsingImageDelegate extends SliverPersistentHeaderDelegate {
               ),
             ),
 
-          // ── Menu button (fades out on collapse)
-          if (controlsOpacity > 0)
-            Positioned(
-              top: topPadding + 8.h,
-              right: 16.w,
-              child: Opacity(
-                opacity: controlsOpacity,
-                child: Container(
-                  width: 36.w,
-                  height: 36.w,
-                  decoration: const BoxDecoration(
-                    color: AppColors.overlayDark,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.more_horiz,
-                    color: Colors.white,
-                    size: 20.sp,
-                  ),
-                ),
-              ),
-            ),
-
           // ── Down arrow (fades in on collapse, acts as back)
           if (arrowOpacity > 0)
             Positioned(

@@ -49,7 +49,15 @@
   },
   "home": {
     "all": "అన్నీ",
-    "forYou": "మీ కోసం"
+    "forYou": "మీ కోసం",
+    "refineRecommendations": "మీ సిఫార్సులను మెరుగుపరచండి",
+    "tabPins": "పిన్‌లు",
+    "tabInterests": "ఆసక్తులు",
+    "tabReported": "నివేదించబడింది",
+    "tabSeeLess": "తక్కువ చూడండి",
+    "noPinsSaved": "మీరు ఇంకా పిన్‌లను సేవ్ చేయలేదు",
+    "noReportedPins": "మీరు పిన్‌లను రిపోర్ట్ చేయలేదు",
+    "noHiddenPins": "దాచిన పిన్‌లు లేవు"
   },
   "auth": {
     "onboardingTagline": "మీకు నచ్చిన\nజీవితాన్ని సృష్టించండి",

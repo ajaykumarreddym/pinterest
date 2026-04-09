@@ -13,6 +13,7 @@ class StorageKeys {
   static const String cachedLanguageStrings = 'cached_language_strings';
   static const String userProfile = 'user_profile';
   static const String savedPins = 'saved_pins';
+  static const String likedPinIds = 'liked_pin_ids';
   static const String reportedPinIds = 'reported_pin_ids';
   static const String hiddenPinIds = 'hidden_pin_ids';
 }

@@ -37,6 +37,8 @@ class PinFilterService {
 
   bool isReported(int photoId) => _reportedIds().contains(photoId);
 
+  Set<int> getReportedIds() => _reportedIds();
+
   // ── Hidden ("not interested") ──
 
   Set<int> _hiddenIds() {
@@ -56,6 +58,8 @@ class PinFilterService {
   }
 
   bool isHidden(int photoId) => _hiddenIds().contains(photoId);
+
+  Set<int> getHiddenIds() => _hiddenIds();
 
   // ── Filter ──
 

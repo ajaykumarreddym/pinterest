@@ -10,8 +10,10 @@ import 'package:pinterest/core/design_systems/borders/app_borders.dart';
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
 import 'package:pinterest/features/home/domain/entities/photo.dart';
 import 'package:pinterest/features/home/presentation/providers/saved_pins_providers.dart';
+import 'package:pinterest/features/home/presentation/widgets/pin_options_bottom_sheet.dart';
 import 'package:pinterest/core/services/social_share/share_service.dart';
 import 'package:pinterest/features/home/presentation/widgets/pin_card.dart';
+import 'package:pinterest/features/pin_detail/presentation/providers/liked_pins_provider.dart';
 import 'package:pinterest/features/pin_detail/presentation/providers/pin_detail_providers.dart';
 
 /// Pin detail screen showing full image, actions, and related pins.
@@ -255,43 +257,31 @@ class _ActionBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isSaved = ref.watch(isPinSavedProvider(photo.id));
+    final isLiked = ref.watch(isPinLikedProvider(photo.id));
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
       child: Row(
         children: [
-          // Like / Save toggle
+          // Like toggle
           _ActionIcon(
-            icon: isSaved ? Icons.favorite : Icons.favorite_border,
-            color: isSaved ? const Color(0xFFE60023) : null,
+            icon: isLiked ? Icons.favorite : Icons.favorite_border,
+            color: isLiked ? const Color(0xFFE60023) : null,
             onTap: () {
-              ref.read(savedPinsProvider.notifier).togglePin(photo);
+              ref.read(likedPinsProvider.notifier).toggleLike(photo.id);
             },
           ),
           SizedBox(width: 20.w),
           // Comment
           _ActionIcon(icon: Icons.chat_bubble_outline, onTap: () {}),
           SizedBox(width: 20.w),
-          // More
-          _ActionIcon(icon: Icons.more_horiz, onTap: () {}),
+          // More options — opens bottom sheet
+          _ActionIcon(
+            icon: Icons.more_horiz,
+            onTap: () {
+              showPinOptionsBottomSheet(context: context, photo: photo);
+            },
+          ),
           const Spacer(),
-          // Visit link
-          if (photo.url.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.only(right: 12.w),
-              child: GestureDetector(
-                onTap: () {},
-                child: Text(
-                  context.tr('general.visit'),
-                  style: TextStyle(
-                    color: AppColors.textPrimaryDark,
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.underline,
-                    decorationColor: AppColors.textPrimaryDark,
-                  ),
-                ),
-              ),
-            ),
           // Save button
           GestureDetector(
             onTap: () {
@@ -303,11 +293,15 @@ class _ActionBar extends ConsumerWidget {
                 vertical: 10.h,
               ),
               decoration: BoxDecoration(
-                color: AppColors.pinterestRed,
+                color: isSaved
+                    ? AppColors.surfaceVariantDark
+                    : AppColors.pinterestRed,
                 borderRadius: AppBorders.button,
               ),
               child: Text(
-                context.tr('general.save'),
+                isSaved
+                    ? context.tr('general.saved')
+                    : context.tr('general.save'),
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15.sp,
@@ -333,9 +327,9 @@ class _PhotographerRow extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
         children: [
-          // Avatar
+          // Avatar — small
           CircleAvatar(
-            radius: 18.r,
+            radius: 14.r,
             backgroundColor: AppColors.surfaceVariantDark,
             child: Text(
               photo.photographer.isNotEmpty
@@ -343,13 +337,13 @@ class _PhotographerRow extends StatelessWidget {
                   : '?',
               style: TextStyle(
                 color: AppColors.textPrimaryDark,
-                fontSize: 14.sp,
+                fontSize: 11.sp,
                 fontWeight: FontWeight.w600,
               ),
             ),
           ),
-          SizedBox(width: 10.w),
-          // Name
+          SizedBox(width: 8.w),
+          // Name — smaller text
           Expanded(
             child: Text(
               photo.photographer,
@@ -357,30 +351,8 @@ class _PhotographerRow extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: AppColors.textPrimaryDark,
-                fontSize: 14.sp,
+                fontSize: 13.sp,
                 fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          // Follow button
-          GestureDetector(
-            onTap: () {},
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: 16.w,
-                vertical: 8.h,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariantDark,
-                borderRadius: AppBorders.button,
-              ),
-              child: Text(
-                context.tr('general.follow'),
-                style: TextStyle(
-                  color: AppColors.textPrimaryDark,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                ),
               ),
             ),
           ),
