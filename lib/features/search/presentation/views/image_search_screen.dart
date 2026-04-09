@@ -116,7 +116,7 @@ class _ImageSearchScreenState extends ConsumerState<ImageSearchScreen> {
                   crossAxisSpacing: 4.w,
                   childCount: filtered.length,
                   itemBuilder: (context, index) {
-                    return PinCard(photo: filtered[index]);
+                    return PinCard(photo: filtered[index], heroTagPrefix: 'imgsearch');
                   },
                 ),
               );

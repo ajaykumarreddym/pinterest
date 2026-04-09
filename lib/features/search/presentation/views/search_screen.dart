@@ -188,7 +188,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen>
           crossAxisSpacing: 4,
           padding: EdgeInsets.all(4.w),
           itemCount: photos.length,
-          itemBuilder: (context, index) => PinCard(photo: photos[index]),
+          itemBuilder: (context, index) => PinCard(photo: photos[index], heroTagPrefix: 'search'),
         );
       },
       loading: () => const ShimmerGrid(),

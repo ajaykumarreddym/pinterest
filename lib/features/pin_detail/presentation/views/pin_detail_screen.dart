@@ -149,7 +149,7 @@ class _PinDetailContent extends ConsumerWidget {
                 crossAxisSpacing: 4,
                 childCount: relatedPins.length,
                 itemBuilder: (context, index) {
-                  return PinCard(photo: relatedPins[index]);
+                  return PinCard(photo: relatedPins[index], heroTagPrefix: 'related');
                 },
               ),
             );

@@ -21,9 +21,10 @@ import 'package:pinterest/features/home/presentation/widgets/pin_options_bottom_
 import 'package:pinterest/router/route_names.dart';
 
 class PinCard extends ConsumerStatefulWidget {
-  const PinCard({super.key, required this.photo});
+  const PinCard({super.key, required this.photo, this.heroTagPrefix = 'pin'});
 
   final Photo photo;
+  final String heroTagPrefix;
 
   @override
   ConsumerState<PinCard> createState() => _PinCardState();
@@ -130,7 +131,7 @@ class _PinCardState extends ConsumerState<PinCard> {
         children: [
           // Image
           Hero(
-            tag: 'pin_${widget.photo.id}',
+            tag: '${widget.heroTagPrefix}_${widget.photo.id}',
             child: ClipRRect(
               borderRadius: AppBorders.pinCard,
               child: SizedBox(
