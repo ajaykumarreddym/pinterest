@@ -53,3 +53,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# AI/Editor config (not for version control)
+.cursor/
+.cursorrules
+.mcp.json
+CLAUDE.md
+GEMINI.md
+AGENTS.md
+.github/
+.code-review-graph/
+.claude/
