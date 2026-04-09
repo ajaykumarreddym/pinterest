@@ -428,7 +428,7 @@ class _EmailStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -462,7 +462,7 @@ class _EmailStep extends StatelessWidget {
               ),
             ),
           ],
-          const Spacer(),
+          SizedBox(height: 24.h),
           AppButton(
             label: context.tr('general.next'),
             onPressed: onNext,
@@ -535,7 +535,7 @@ class _PasswordStepState extends State<_PasswordStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -622,7 +622,7 @@ class _PasswordStepState extends State<_PasswordStep> {
             ),
           ),
 
-          const Spacer(),
+          SizedBox(height: 24.h),
 
           // ── Next button ──
           AppButton(

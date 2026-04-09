@@ -179,6 +179,15 @@
   },
   "messages": {
     "title": "संदेश",
-    "subtitle": "दोस्तों के साथ विचार साझा करें"
+    "subtitle": "दोस्तों के साथ विचार साझा करें",
+    "updatesTab": "अपडेट",
+    "messagesTab": "संदेश",
+    "newMessage": "नया संदेश",
+    "markAllRead": "सभी को पढ़ा हुआ चिह्नित करें",
+    "noUpdatesTitle": "अभी तक कोई अपडेट नहीं",
+    "noUpdatesSubtitle": "जब कोई आपकी सामग्री से इंटरैक्ट करेगा, तो वह यहाँ दिखाई देगा",
+    "noMessagesTitle": "अभी तक कोई संदेश नहीं",
+    "noMessagesSubtitle": "दोस्तों के साथ पिन और विचार साझा करें",
+    "typeMessage": "संदेश टाइप करें..."
   }
 }

@@ -133,14 +133,18 @@ class _SearchFilterBottomSheetState extends State<SearchFilterBottomSheet> {
                       child: Container(
                         height: 48.h,
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceVariantDark,
+                          color: _selected != widget.currentFilter
+                              ? AppColors.textPrimaryDark
+                              : AppColors.surfaceVariantDark,
                           borderRadius: AppBorders.full,
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           context.tr('general.confirm'),
                           style: AppTypography.labelLarge.copyWith(
-                            color: AppColors.textTertiaryDark,
+                            color: _selected != widget.currentFilter
+                                ? AppColors.backgroundDark
+                                : AppColors.textTertiaryDark,
                           ),
                         ),
                       ),

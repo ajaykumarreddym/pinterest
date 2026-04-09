@@ -58,7 +58,7 @@ class _EmailVerificationScreenState
           ),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: 24.w),
         child: Column(
           children: [

@@ -13,10 +13,14 @@ import 'package:pinterest/features/home/presentation/views/home_screen.dart';
 import 'package:pinterest/features/search/presentation/views/search_screen.dart';
 import 'package:pinterest/features/create/presentation/views/create_screen.dart';
 import 'package:pinterest/features/messages/presentation/views/messages_screen.dart';
+import 'package:pinterest/features/messages/presentation/views/chat_detail_screen.dart';
+import 'package:pinterest/features/messages/domain/entities/conversation.dart';
 import 'package:pinterest/features/profile/presentation/views/profile_screen.dart';
 import 'package:pinterest/features/pin_detail/presentation/views/pin_detail_screen.dart';
 import 'package:pinterest/features/search/presentation/views/image_search_screen.dart';
 import 'package:pinterest/features/search/presentation/views/search_results_screen.dart';
+import 'package:pinterest/features/search/presentation/views/video_detail_screen.dart';
+import 'package:pinterest/features/search/domain/entities/search_video.dart';
 import 'package:pinterest/features/settings/presentation/views/account_screen.dart';
 import 'package:pinterest/router/route_names.dart';
 import 'package:pinterest/router/shell_scaffold.dart';
@@ -148,6 +152,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
 
+      // Video detail (pushes over shell)
+      GoRoute(
+        name: RouteNames.videoDetail,
+        path: RoutePaths.videoDetail,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final video = state.extra! as SearchVideo;
+          return VideoDetailScreen(video: video);
+        },
+      ),
+
       // Search results (pushed from search home)
       GoRoute(
         name: RouteNames.searchResults,
@@ -165,6 +180,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.account,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AccountScreen(),
+      ),
+
+      // Chat detail (pushes over shell)
+      GoRoute(
+        name: RouteNames.chatDetail,
+        path: RoutePaths.chatDetail,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final conversation = state.extra! as Conversation;
+          return ChatDetailScreen(conversation: conversation);
+        },
       ),
     ],
   );

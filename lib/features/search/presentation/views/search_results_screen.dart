@@ -12,9 +12,13 @@ import 'package:pinterest/core/utils/debouncer.dart';
 import 'package:pinterest/features/home/presentation/widgets/pin_card.dart';
 import 'package:pinterest/features/home/presentation/widgets/shimmer_grid.dart';
 import 'package:pinterest/features/localization/presentation/extensions/localization_extension.dart';
+import 'package:pinterest/features/search/domain/entities/search_results_data.dart';
 import 'package:pinterest/features/search/presentation/providers/search_providers.dart';
+import 'package:pinterest/features/search/presentation/widgets/board_result_card.dart';
+import 'package:pinterest/features/search/presentation/widgets/profile_result_card.dart';
 import 'package:pinterest/features/search/presentation/widgets/search_filter_bottom_sheet.dart';
 import 'package:pinterest/features/search/presentation/widgets/search_suggestion_chips.dart';
+import 'package:pinterest/features/search/presentation/widgets/video_result_card.dart';
 
 /// Pinterest search results screen.
 ///
@@ -48,7 +52,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(searchQueryProvider.notifier).state = widget.initialQuery;
       if (widget.initialQuery.isNotEmpty) {
-        ref.read(searchPhotosProvider.notifier).search(widget.initialQuery);
+        ref.read(searchResultsProvider.notifier).search(widget.initialQuery);
       } else {
         _focusNode.requestFocus();
       }
@@ -58,14 +62,14 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      ref.read(searchPhotosProvider.notifier).loadMore();
+      ref.read(searchResultsProvider.notifier).loadMore();
     }
   }
 
   void _onSearchChanged(String query) {
     ref.read(searchQueryProvider.notifier).state = query;
     _debouncer.call(() {
-      ref.read(searchPhotosProvider.notifier).search(query.trim());
+      ref.read(searchResultsProvider.notifier).search(query.trim());
     });
   }
 
@@ -74,7 +78,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
     final combinedQuery = '$currentQuery $suggestion'.trim();
     _searchController.text = combinedQuery;
     ref.read(searchQueryProvider.notifier).state = combinedQuery;
-    ref.read(searchPhotosProvider.notifier).search(combinedQuery);
+    ref.read(searchResultsProvider.notifier).search(combinedQuery);
   }
 
   @override
@@ -88,9 +92,19 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final searchState = ref.watch(searchPhotosProvider);
+    final searchState = ref.watch(searchResultsProvider);
     final currentFilter = ref.watch(searchFilterProvider);
     final query = ref.watch(searchQueryProvider);
+
+    // Re-search when filter changes
+    ref.listen(searchFilterProvider, (prev, next) {
+      if (prev != next) {
+        final currentQuery = ref.read(searchQueryProvider);
+        if (currentQuery.isNotEmpty) {
+          ref.read(searchResultsProvider.notifier).search(currentQuery);
+        }
+      }
+    });
 
     // Generate suggestion chips based on query
     final suggestions = _getSuggestionsForQuery(query);
@@ -153,7 +167,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                               textInputAction: TextInputAction.search,
                               onSubmitted: (value) {
                                 ref
-                                    .read(searchPhotosProvider.notifier)
+                                    .read(searchResultsProvider.notifier)
                                     .search(value.trim());
                               },
                             ),
@@ -171,6 +185,12 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                       currentFilter: currentFilter,
                       onFilterSelected: (filter) {
                         ref.read(searchFilterProvider.notifier).state = filter;
+                        final currentQuery = ref.read(searchQueryProvider);
+                        if (currentQuery.isNotEmpty) {
+                          ref
+                              .read(searchResultsProvider.notifier)
+                              .search(currentQuery);
+                        }
                       },
                     ),
                     child: Icon(
@@ -182,6 +202,51 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
                 ],
               ),
             ),
+
+            // Active filter chip
+            if (currentFilter != SearchFilterType.allPins)
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.space4,
+                  vertical: AppSpacing.space2,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () {
+                      ref.read(searchFilterProvider.notifier).state =
+                          SearchFilterType.allPins;
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.space4,
+                        vertical: AppSpacing.space2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.textPrimaryDark,
+                        borderRadius: AppBorders.full,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _filterLabel(context, currentFilter),
+                            style: AppTypography.labelMedium.copyWith(
+                              color: AppColors.backgroundDark,
+                            ),
+                          ),
+                          SizedBox(width: AppSpacing.space2),
+                          Icon(
+                            Icons.close,
+                            size: 14.sp,
+                            color: AppColors.backgroundDark,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
 
             // Suggestion chips
             if (suggestions.isNotEmpty) ...[
@@ -202,41 +267,14 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
     );
   }
 
-  Widget _buildResults(AsyncValue searchState, String query) {
+  Widget _buildResults(AsyncValue<SearchResultsData> searchState, String query) {
     return searchState.when(
-      data: (photos) {
-        if (photos.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.search_off,
-                  color: AppColors.textTertiaryDark,
-                  size: 48.sp,
-                ),
-                SizedBox(height: AppSpacing.space4),
-                Text(
-                  '${context.tr('search.noResultsFor')} "$query"',
-                  style: AppTypography.bodyLarge.copyWith(
-                    color: AppColors.textSecondaryDark,
-                  ),
-                ),
-              ],
-            ),
-          );
-        }
-
-        return MasonryGridView.count(
-          controller: _scrollController,
-          crossAxisCount: 2,
-          mainAxisSpacing: AppSpacing.gridGutter,
-          crossAxisSpacing: AppSpacing.gridGutter,
-          padding: EdgeInsets.all(4.w),
-          itemCount: photos.length,
-          itemBuilder: (context, index) =>
-              PinCard(photo: photos[index], heroTagPrefix: 'search'),
-        );
+      data: (data) => switch (data) {
+        PinResultsData(:final photos) => _buildPinGrid(photos, query),
+        VideoResultsData(:final videos) => _buildVideoGrid(videos, query),
+        BoardResultsData(:final boards) => _buildBoardList(boards, query),
+        ProfileResultsData(:final profiles) =>
+          _buildProfileList(profiles, query),
       },
       loading: () => const ShimmerGrid(),
       error: (error, _) => Center(
@@ -252,7 +290,7 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
             SizedBox(height: AppSpacing.space4),
             TextButton(
               onPressed: () =>
-                  ref.read(searchPhotosProvider.notifier).search(query),
+                  ref.read(searchResultsProvider.notifier).search(query),
               child: Text(
                 context.tr('general.retry'),
                 style: AppTypography.labelMedium.copyWith(
@@ -264,6 +302,92 @@ class _SearchResultsScreenState extends ConsumerState<SearchResultsScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildEmptyState(String query, IconData icon) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: AppColors.textTertiaryDark, size: 48.sp),
+          SizedBox(height: AppSpacing.space4),
+          Text(
+            '${context.tr('search.noResultsFor')} "$query"',
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.textSecondaryDark,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPinGrid(List photos, String query) {
+    if (photos.isEmpty) return _buildEmptyState(query, Icons.search_off);
+
+    return MasonryGridView.count(
+      controller: _scrollController,
+      crossAxisCount: 2,
+      mainAxisSpacing: AppSpacing.gridGutter,
+      crossAxisSpacing: AppSpacing.gridGutter,
+      padding: EdgeInsets.all(4.w),
+      itemCount: photos.length,
+      itemBuilder: (context, index) =>
+          PinCard(photo: photos[index], heroTagPrefix: 'search'),
+    );
+  }
+
+  Widget _buildVideoGrid(List videos, String query) {
+    if (videos.isEmpty) return _buildEmptyState(query, Icons.videocam_off);
+
+    return MasonryGridView.count(
+      controller: _scrollController,
+      crossAxisCount: 2,
+      mainAxisSpacing: AppSpacing.gridGutter,
+      crossAxisSpacing: AppSpacing.gridGutter,
+      padding: EdgeInsets.all(4.w),
+      itemCount: videos.length,
+      itemBuilder: (context, index) => GestureDetector(
+        onTap: () => context.push(
+          '/video-detail',
+          extra: videos[index],
+        ),
+        child: VideoResultCard(video: videos[index]),
+      ),
+    );
+  }
+
+  Widget _buildBoardList(List boards, String query) {
+    if (boards.isEmpty) return _buildEmptyState(query, Icons.dashboard);
+
+    return ListView.builder(
+      controller: _scrollController,
+      padding: EdgeInsets.all(AppSpacing.space4),
+      itemCount: boards.length,
+      itemBuilder: (context, index) =>
+          BoardResultCard(board: boards[index]),
+    );
+  }
+
+  Widget _buildProfileList(List profiles, String query) {
+    if (profiles.isEmpty) return _buildEmptyState(query, Icons.person_off);
+
+    return ListView.builder(
+      controller: _scrollController,
+      padding: EdgeInsets.all(AppSpacing.space4),
+      itemCount: profiles.length,
+      itemBuilder: (context, index) =>
+          ProfileResultCard(profile: profiles[index]),
+    );
+  }
+
+  String _filterLabel(BuildContext context, SearchFilterType filter) {
+    return switch (filter) {
+      SearchFilterType.allPins => context.tr('search.allPins'),
+      SearchFilterType.videos => context.tr('search.videos'),
+      SearchFilterType.boards => context.tr('search.boards'),
+      SearchFilterType.profiles => context.tr('search.profiles'),
+    };
   }
 
   List<SearchSuggestion> _getSuggestionsForQuery(String query) {

@@ -218,6 +218,15 @@
   },
   "messages": {
     "title": "Messages",
-    "subtitle": "Share ideas with friends"
+    "subtitle": "Share ideas with friends",
+    "updatesTab": "Updates",
+    "messagesTab": "Messages",
+    "newMessage": "New message",
+    "markAllRead": "Mark all as read",
+    "noUpdatesTitle": "No updates yet",
+    "noUpdatesSubtitle": "When someone interacts with your content, you'll see it here",
+    "noMessagesTitle": "No messages yet",
+    "noMessagesSubtitle": "Share pins and ideas with friends",
+    "typeMessage": "Type a message..."
   }
 }

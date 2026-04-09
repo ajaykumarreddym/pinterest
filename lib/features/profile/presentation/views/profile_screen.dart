@@ -34,6 +34,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late TabController _tabController;
   String _feedLayout = 'compact';
+  String _pinsFilter = 'saved'; // 'saved' or 'created'
 
   @override
   bool get wantKeepAlive => true;
@@ -185,45 +186,48 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
 
   // ── Shared Widgets ──
 
-  Widget _buildSearchRow() {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.space5,
-        AppSpacing.space4,
-        AppSpacing.space5,
-        AppSpacing.space3,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              height: 40.h,
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.space4),
-              decoration: BoxDecoration(
-                borderRadius: AppBorders.full,
-                border: Border.all(color: AppColors.dividerDark),
+  Widget _buildSelectableChip(
+    String label, {
+    IconData? icon,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.space4,
+          vertical: AppSpacing.space3,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.textPrimaryDark
+              : AppColors.surfaceVariantDark,
+          borderRadius: AppBorders.full,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                color: isSelected
+                    ? AppColors.backgroundDark
+                    : AppColors.textPrimaryDark,
+                size: 14.sp,
               ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.search,
-                    color: AppColors.textSecondaryDark,
-                    size: 20.sp,
-                  ),
-                  SizedBox(width: AppSpacing.space3),
-                  Text(
-                    'Search your Pins',
-                    style: AppTypography.bodyMedium.copyWith(
-                      color: AppColors.textTertiaryDark,
-                    ),
-                  ),
-                ],
+              SizedBox(width: AppSpacing.space2),
+            ],
+            Text(
+              label,
+              style: AppTypography.labelSmall.copyWith(
+                color: isSelected
+                    ? AppColors.backgroundDark
+                    : AppColors.textPrimaryDark,
               ),
             ),
-          ),
-          SizedBox(width: AppSpacing.space4),
-          Icon(Icons.add, color: AppColors.textPrimaryDark, size: 28.sp),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -261,7 +265,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
   Widget _buildPinsTab() {
     return Column(
       children: [
-        _buildSearchRow(),
+        SizedBox(height: AppSpacing.space4),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: AppSpacing.space4),
           child: Row(
@@ -282,17 +286,27 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 ),
               ),
               SizedBox(width: AppSpacing.space3),
-              _buildChip(
+              _buildSelectableChip(
                 context.tr('profile.favourites'),
                 icon: Icons.star,
+                isSelected: _pinsFilter == 'saved',
+                onTap: () => setState(() => _pinsFilter = 'saved'),
               ),
               SizedBox(width: AppSpacing.space3),
-              _buildChip(context.tr('profile.createdByYou')),
+              _buildSelectableChip(
+                context.tr('profile.createdByYou'),
+                isSelected: _pinsFilter == 'created',
+                onTap: () => setState(() => _pinsFilter = 'created'),
+              ),
             ],
           ),
         ),
         SizedBox(height: AppSpacing.space3),
-        Expanded(child: _buildPinsGrid()),
+        Expanded(
+          child: _pinsFilter == 'created'
+              ? _buildCreatedPinsGrid()
+              : _buildPinsGrid(),
+        ),
       ],
     );
   }
@@ -374,13 +388,70 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
     );
   }
 
+  Widget _buildCreatedPinsGrid() {
+    final createdPins = ref.watch(createdPinsProvider);
+    if (createdPins.isEmpty) {
+      return Center(
+        child: Text(
+          'No created pins yet',
+          style: AppTypography.bodyLarge.copyWith(
+            color: AppColors.textSecondaryDark,
+          ),
+        ),
+      );
+    }
+    final crossAxisCount =
+        _feedLayout == 'wide' ? 1 : (_feedLayout == 'standard' ? 2 : 3);
+    return Column(
+      children: [
+        Expanded(
+          child: GridView.builder(
+            padding: EdgeInsets.all(AppSpacing.gridPadding),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: AppSpacing.gridGutter,
+              mainAxisSpacing: AppSpacing.gridGutter,
+            ),
+            itemCount: createdPins.length,
+            itemBuilder: (context, index) {
+              final pin = createdPins[index];
+              return ClipRRect(
+                borderRadius: AppBorders.lg,
+                child: Image.file(
+                  File(pin.imagePath),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: AppColors.surfaceDark,
+                    child: Icon(
+                      Icons.broken_image_outlined,
+                      color: AppColors.textTertiaryDark,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.space3),
+          child: Text(
+            '${createdPins.length} Pins created',
+            style: AppTypography.bodySmall.copyWith(
+              color: AppColors.textTertiaryDark,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   // ── Boards Tab ──
 
   Widget _buildBoardsTab() {
     final boards = ref.watch(boardsProvider);
     return Column(
       children: [
-        _buildSearchRow(),
+        SizedBox(height: AppSpacing.space4),
         Expanded(
           child: boards.isEmpty
               ? _buildBoardsEmptyState()
@@ -476,8 +547,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
           child: Row(
             children: [
               _buildChip(context.tr('profile.createdByYou')),
-              SizedBox(width: AppSpacing.space3),
-              _buildChip('In progress'),
             ],
           ),
         ),
@@ -635,28 +704,38 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
 
   Widget _buildLayoutOption(String label, String value) {
     final isSelected = _feedLayout == value;
-    return GestureDetector(
-      onTap: () {
-        setState(() => _feedLayout = value);
-        ref.read(settingsDatasourceProvider).setFeedLayout(value);
-        Navigator.pop(context);
-      },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: AppTypography.h3.copyWith(
-              color: AppColors.textPrimaryDark,
-            ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          ref.read(settingsDatasourceProvider).setFeedLayout(value);
+          setState(() => _feedLayout = value);
+          Navigator.pop(context);
+        },
+        borderRadius: AppBorders.md,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: AppSpacing.space4,
+            horizontal: AppSpacing.space3,
           ),
-          if (isSelected)
-            Icon(
-              Icons.check,
-              color: AppColors.textPrimaryDark,
-              size: 24.sp,
-            ),
-        ],
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: AppTypography.h3.copyWith(
+                  color: AppColors.textPrimaryDark,
+                ),
+              ),
+              if (isSelected)
+                Icon(
+                  Icons.check,
+                  color: AppColors.textPrimaryDark,
+                  size: 24.sp,
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

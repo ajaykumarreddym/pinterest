@@ -171,7 +171,7 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,7 +278,7 @@ class _SignupBirthdayStepState extends State<SignupBirthdayStep> {
             ),
           ),
 
-          const Spacer(),
+          SizedBox(height: 24.h),
 
           // ── Next button ──
           AppButton(

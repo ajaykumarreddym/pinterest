@@ -21,8 +21,10 @@ class RouteNames {
 
   // Detail
   static const String pinDetail = 'pinDetail';
+  static const String videoDetail = 'videoDetail';
   static const String imageSearch = 'imageSearch';
   static const String searchResults = 'searchResults';
+  static const String chatDetail = 'chatDetail';
 
   // Settings
   static const String settings = 'settings';
@@ -44,8 +46,10 @@ class RoutePaths {
   static const String messages = '/messages';
   static const String profile = '/profile';
   static const String pinDetail = '/pin/:id';
+  static const String videoDetail = '/video-detail';
   static const String imageSearch = '/image-search';
   static const String searchResults = '/search-results';
   static const String settings = '/settings';
   static const String account = '/account';
+  static const String chatDetail = '/chat/:conversationId';
 }

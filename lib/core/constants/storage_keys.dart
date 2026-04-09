@@ -22,4 +22,9 @@ class StorageKeys {
   static const String notificationsEnabled = 'notifications_enabled';
   static const String profileVisibility = 'profile_visibility';
   static const String feedLayout = 'feed_layout';
+
+  // Messages/Inbox
+  static const String cachedConversations = 'cached_conversations';
+  static const String cachedInboxUpdates = 'cached_inbox_updates';
+  static const String cachedMessages = 'cached_messages';
 }

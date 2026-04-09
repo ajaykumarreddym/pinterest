@@ -65,16 +65,8 @@ class LocalizationNotifier extends AsyncNotifier<LanguageData> {
 
     AppLogger.info('🌍 Localization init — language: ${language.displayName}');
 
-    // Try cached strings first for instant load
-    final cachedStrings = repo.getCachedLanguageStrings();
-    if (cachedStrings != null) {
-      AppLogger.info('📦 Using cached strings for ${language.code}');
-      final data = LanguageData(language: language, strings: cachedStrings);
-      _applyStrings(data);
-      return data;
-    }
-
-    // Load from assets
+    // Always load from assets to pick up any new/changed keys,
+    // falling back to cache if asset loading fails.
     return _loadLanguage(language);
   }
 

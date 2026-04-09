@@ -101,7 +101,7 @@ class _SignupEmailVerificationStepState
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         children: [

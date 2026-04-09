@@ -269,6 +269,18 @@ class _ActionBar extends ConsumerWidget {
             },
           ),
           SizedBox(width: 20.w),
+          // Share
+          _ActionIcon(
+            icon: Icons.share_outlined,
+            onTap: () {
+              ref.read(shareServiceProvider).shareImage(
+                imageUrl: photo.src.medium,
+                text: photo.alt.isNotEmpty
+                    ? photo.alt
+                    : 'Check out this pin!',
+              );
+            },
+          ),
           SizedBox(width: 20.w),
           // More options
           _ActionIcon(
