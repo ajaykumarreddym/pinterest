@@ -272,8 +272,8 @@ class _ActionBar extends ConsumerWidget {
           ),
           SizedBox(width: 20.w),
           // Comment
-          _ActionIcon(icon: Icons.chat_bubble_outline, onTap: () {}),
-          SizedBox(width: 20.w),
+          // _ActionIcon(icon: Icons.chat_bubble_outline, onTap: () {}),
+          // SizedBox(width: 20.w), 
           // More options — opens bottom sheet
           _ActionIcon(
             icon: Icons.more_horiz,
