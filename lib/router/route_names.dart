@@ -22,9 +22,11 @@ class RouteNames {
   // Detail
   static const String pinDetail = 'pinDetail';
   static const String imageSearch = 'imageSearch';
+  static const String searchResults = 'searchResults';
 
   // Settings
   static const String settings = 'settings';
+  static const String account = 'account';
 }
 
 /// Route path constants.
@@ -43,5 +45,7 @@ class RoutePaths {
   static const String profile = '/profile';
   static const String pinDetail = '/pin/:id';
   static const String imageSearch = '/image-search';
+  static const String searchResults = '/search-results';
   static const String settings = '/settings';
+  static const String account = '/account';
 }

@@ -145,7 +145,19 @@
     "searchForIdeas": "Search for ideas",
     "ideasForYou": "Ideas for you",
     "moreToExplore": "More to explore",
-    "noResultsFor": "No results for"
+    "noResultsFor": "No results for",
+    "popularOnPinterest": "Popular on Pinterest",
+    "perYourTaste": "Per your taste",
+    "exploreFeaturedBoards": "Explore featured boards",
+    "bringInspiration": "Bring your inspiration to life",
+    "ideasForYouSection": "Ideas for you",
+    "filterBy": "Filter by",
+    "allPins": "All Pins",
+    "videos": "Videos",
+    "boards": "Boards",
+    "profiles": "Profiles",
+    "clearAll": "Clear all",
+    "pins": "Pins"
   },
   "categories": {
     "wallpapers": "Wallpapers",
@@ -180,6 +192,29 @@
   "create": {
     "title": "Create",
     "subtitle": "Create a Pin or Collage"
+  },
+  "settings": {
+    "yourAccount": "Your account",
+    "settings": "Settings",
+    "accountManagement": "Account management",
+    "profileVisibility": "Profile visibility",
+    "refineRecommendations": "Refine your recommendations",
+    "claimedExternalAccounts": "Claimed external accounts",
+    "socialPermissions": "Social permissions",
+    "notifications": "Notifications",
+    "privacyAndData": "Privacy and data",
+    "reportsAndViolations": "Reports and violations centre",
+    "login": "Login",
+    "addAccount": "Add account",
+    "security": "Security",
+    "logOut": "Log out",
+    "support": "Support",
+    "helpCentre": "Help Centre",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "about": "About",
+    "viewProfile": "View profile",
+    "shareProfile": "Share profile"
   },
   "messages": {
     "title": "Messages",

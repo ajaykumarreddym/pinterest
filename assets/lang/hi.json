@@ -106,7 +106,19 @@
     "searchForIdeas": "विचार खोजें",
     "ideasForYou": "आपके लिए विचार",
     "moreToExplore": "और खोजें",
-    "noResultsFor": "कोई परिणाम नहीं"
+    "noResultsFor": "कोई परिणाम नहीं",
+    "popularOnPinterest": "Pinterest पर लोकप्रिय",
+    "perYourTaste": "आपकी पसंद के अनुसार",
+    "exploreFeaturedBoards": "चुनिंदा बोर्ड देखें",
+    "bringInspiration": "अपनी प्रेरणा को जीवन दें",
+    "ideasForYouSection": "आपके लिए विचार",
+    "filterBy": "फ़िल्टर करें",
+    "allPins": "सभी पिन",
+    "videos": "वीडियो",
+    "boards": "बोर्ड",
+    "profiles": "प्रोफ़ाइल",
+    "clearAll": "सब साफ़ करें",
+    "pins": "पिन"
   },
   "categories": {
     "wallpapers": "वॉलपेपर",
@@ -141,6 +153,29 @@
   "create": {
     "title": "बनाएं",
     "subtitle": "पिन या कोलाज बनाएं"
+  },
+  "settings": {
+    "yourAccount": "आपका खाता",
+    "settings": "सेटिंग्स",
+    "accountManagement": "खाता प्रबंधन",
+    "profileVisibility": "प्रोफ़ाइल दृश्यता",
+    "refineRecommendations": "अपनी सिफारिशें परिष्कृत करें",
+    "claimedExternalAccounts": "दावा किए गए बाहरी खाते",
+    "socialPermissions": "सामाजिक अनुमतियाँ",
+    "notifications": "सूचनाएँ",
+    "privacyAndData": "गोपनीयता और डेटा",
+    "reportsAndViolations": "रिपोर्ट और उल्लंघन केंद्र",
+    "login": "लॉगिन",
+    "addAccount": "खाता जोड़ें",
+    "security": "सुरक्षा",
+    "logOut": "लॉग आउट",
+    "support": "सहायता",
+    "helpCentre": "सहायता केंद्र",
+    "termsOfService": "सेवा की शर्तें",
+    "privacyPolicy": "गोपनीयता नीति",
+    "about": "के बारे में",
+    "viewProfile": "प्रोफ़ाइल देखें",
+    "shareProfile": "प्रोफ़ाइल साझा करें"
   },
   "messages": {
     "title": "संदेश",

@@ -19,4 +19,7 @@ class StorageKeys {
   static const String createdPins = 'created_pins';
   static const String boards = 'boards';
   static const String collages = 'collages';
+  static const String notificationsEnabled = 'notifications_enabled';
+  static const String profileVisibility = 'profile_visibility';
+  static const String feedLayout = 'feed_layout';
 }

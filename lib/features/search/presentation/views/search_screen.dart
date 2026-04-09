@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:shimmer/shimmer.dart';
 
-import 'package:pinterest/features/localization/presentation/extensions/localization_extension.dart';
+import 'package:pinterest/core/design_systems/borders/app_borders.dart';
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
-import 'package:pinterest/core/utils/debouncer.dart';
-import 'package:pinterest/features/home/presentation/widgets/pin_card.dart';
-import 'package:pinterest/features/home/presentation/widgets/shimmer_grid.dart';
+import 'package:pinterest/core/design_systems/spacing/app_spacing.dart';
+import 'package:pinterest/core/design_systems/typography/app_typography.dart';
+import 'package:pinterest/features/localization/presentation/extensions/localization_extension.dart';
+import 'package:pinterest/features/search/presentation/providers/search_explore_notifier.dart';
 import 'package:pinterest/features/search/presentation/providers/search_providers.dart';
+import 'package:pinterest/features/search/presentation/views/search_results_screen.dart';
+import 'package:pinterest/features/search/presentation/widgets/featured_board_card.dart';
+import 'package:pinterest/features/search/presentation/widgets/popular_category_section.dart';
+import 'package:pinterest/features/search/presentation/widgets/taste_carousel.dart';
 
-/// Search/Explore screen with live search via Pexels API.
+/// Pinterest search home / explore screen.
+///
+/// Shows the search bar at top, "Per your taste" hero carousel,
+/// "Explore featured boards" section, and "Popular on Pinterest" sections.
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
@@ -20,290 +28,334 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen>
     with AutomaticKeepAliveClientMixin {
-  final _searchController = TextEditingController();
-  final _scrollController = ScrollController();
-  final _debouncer = Debouncer(duration: const Duration(milliseconds: 500));
-  final _focusNode = FocusNode();
-
   @override
   bool get wantKeepAlive => true;
 
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_onScroll);
-  }
-
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      ref.read(searchPhotosProvider.notifier).loadMore();
-    }
-  }
-
-  void _onSearchChanged(String query) {
-    ref.read(searchQueryProvider.notifier).state = query;
-    _debouncer.call(() {
-      ref.read(searchPhotosProvider.notifier).search(query.trim());
-    });
-  }
-
-  void _clearSearch() {
-    _searchController.clear();
-    ref.read(searchQueryProvider.notifier).state = '';
-    ref.read(searchPhotosProvider.notifier).search('');
-    _focusNode.unfocus();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _scrollController.dispose();
-    _debouncer.dispose();
-    _focusNode.dispose();
-    super.dispose();
+  void _navigateToResults(String query) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SearchResultsScreen(initialQuery: query),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
-    final query = ref.watch(searchQueryProvider);
-    final searchState = ref.watch(searchPhotosProvider);
+    final exploreState = ref.watch(searchExploreProvider);
 
     return Scaffold(
       backgroundColor: AppColors.backgroundDark,
       body: SafeArea(
         child: Column(
           children: [
-            // Search bar
-            Padding(
-              padding: EdgeInsets.all(12.w),
-              child: Container(
-                height: 48.h,
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceVariantDark,
-                  borderRadius: BorderRadius.circular(24.r),
+            // Search bar (tappable, navigates to results)
+            _SearchBarTappable(
+              onTap: () => _navigateToResults(''),
+            ),
+            // Explore content
+            Expanded(
+              child: exploreState.when(
+                data: (data) => _ExploreContent(
+                  data: data,
+                  onCategoryTap: _navigateToResults,
                 ),
-                child: Row(
-                  children: [
-                    SizedBox(width: 16.w),
-                    Icon(
-                      Icons.search,
-                      color: AppColors.iconDefault,
-                      size: 22.sp,
-                    ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        focusNode: _focusNode,
-                        onChanged: _onSearchChanged,
-                        style: TextStyle(
-                          color: AppColors.textPrimaryDark,
-                          fontSize: 16.sp,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: context.tr('search.searchForIdeas'),
-                          hintStyle: TextStyle(
-                            color: AppColors.textTertiaryDark,
-                            fontSize: 16.sp,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                          isDense: true,
-                        ),
-                        textInputAction: TextInputAction.search,
-                        onSubmitted: (value) {
-                          ref
-                              .read(searchPhotosProvider.notifier)
-                              .search(value.trim());
-                        },
-                      ),
-                    ),
-                    if (query.isNotEmpty)
-                      GestureDetector(
-                        onTap: _clearSearch,
-                        child: Icon(
-                          Icons.close,
-                          color: AppColors.iconDefault,
-                          size: 20.sp,
-                        ),
-                      )
-                    else
-                      Icon(
-                        Icons.camera_alt_outlined,
-                        color: AppColors.iconDefault,
-                        size: 22.sp,
-                      ),
-                    SizedBox(width: 16.w),
-                  ],
+                loading: () => const _ExploreShimmerLoading(),
+                error: (error, _) => _ExploreError(
+                  onRetry: () =>
+                      ref.read(searchExploreProvider.notifier).refresh(),
                 ),
               ),
             ),
-
-            // Results
-            Expanded(child: _buildBody(query, searchState)),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildBody(String query, AsyncValue searchState) {
-    // Empty state — show explore categories
-    if (query.isEmpty) {
-      return _buildExploreContent();
-    }
+/// Tappable search bar that navigates to the search results screen.
+class _SearchBarTappable extends StatelessWidget {
+  const _SearchBarTappable({required this.onTap});
 
-    return searchState.when(
-      data: (photos) {
-        if (photos.isEmpty) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.search_off,
-                  color: AppColors.textTertiaryDark,
-                  size: 48.sp,
-                ),
-                SizedBox(height: 12.h),
-                Text(
-                  '${context.tr('search.noResultsFor')} "$query"',
-                  style: TextStyle(
-                    color: AppColors.textSecondaryDark,
-                    fontSize: 16.sp,
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(AppSpacing.space4),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 48.h,
+          decoration: BoxDecoration(
+            color: AppColors.surfaceVariantDark,
+            borderRadius: AppBorders.searchBar,
+            border: Border.all(
+              color: AppColors.textTertiaryDark,
+              width: 1.w,
+            ),
+          ),
+          child: Row(
+            children: [
+              SizedBox(width: AppSpacing.space5),
+              Icon(
+                Icons.search,
+                color: AppColors.iconDefault,
+                size: 22.sp,
+              ),
+              SizedBox(width: AppSpacing.space3),
+              Expanded(
+                child: Text(
+                  context.tr('search.searchForIdeas'),
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: AppColors.textTertiaryDark,
                   ),
                 ),
-              ],
-            ),
-          );
-        }
-
-        return MasonryGridView.count(
-          controller: _scrollController,
-          crossAxisCount: 2,
-          mainAxisSpacing: 4,
-          crossAxisSpacing: 4,
-          padding: EdgeInsets.all(4.w),
-          itemCount: photos.length,
-          itemBuilder: (context, index) => PinCard(photo: photos[index], heroTagPrefix: 'search'),
-        );
-      },
-      loading: () => const ShimmerGrid(),
-      error: (error, _) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              context.tr('errors.somethingWentWrong'),
-              style: TextStyle(
-                color: AppColors.textSecondaryDark,
-                fontSize: 16.sp,
               ),
-            ),
-            SizedBox(height: 12.h),
-            TextButton(
-              onPressed: () => ref
-                  .read(searchPhotosProvider.notifier)
-                  .search(query),
-              child: Text(
-                context.tr('general.retry'),
-                style: TextStyle(
-                  color: AppColors.pinterestRed,
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+            
+              SizedBox(width: AppSpacing.space5),
+            ],
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildExploreContent() {
-    final categories = [
-      _Category(context.tr('categories.wallpapers'), Color(0xFF1B3A4B)),
-      _Category(context.tr('categories.nature'), Color(0xFF2D6A4F)),
-      _Category(context.tr('categories.architecture'), Color(0xFF3D405B)),
-      _Category(context.tr('categories.travel'), Color(0xFFE07A5F)),
-      _Category(context.tr('categories.fashion'), Color(0xFF81B29A)),
-      _Category(context.tr('categories.food'), Color(0xFFF2CC8F)),
-      _Category(context.tr('categories.animals'), Color(0xFF6D597A)),
-      _Category(context.tr('categories.art'), Color(0xFFBC4749)),
-    ];
+/// Main explore content when data is loaded.
+class _ExploreContent extends StatelessWidget {
+  const _ExploreContent({
+    required this.data,
+    required this.onCategoryTap,
+  });
 
+  final SearchExploreData data;
+  final ValueChanged<String> onCategoryTap;
+
+  @override
+  Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 8.h),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4.w),
-            child: Text(
-              context.tr('search.ideasForYou'),
-              style: TextStyle(
-                color: AppColors.textPrimaryDark,
-                fontSize: 20.sp,
-                fontWeight: FontWeight.w700,
+          // Hero taste carousel
+          if (data.tasteCards.isNotEmpty) ...[
+            TasteCarousel(
+              cards: data.tasteCards,
+              onCardTap: (index) {
+                onCategoryTap(data.tasteCards[index].title);
+              },
+            ),
+            SizedBox(height: AppSpacing.space7),
+          ],
+
+          // Featured boards section
+          if (data.featuredBoards.isNotEmpty) ...[
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.space5),
+              child: Text(
+                context.tr('search.exploreFeaturedBoards'),
+                style: AppTypography.caption.copyWith(
+                  color: AppColors.textTertiaryDark,
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 12.h),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: categories.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 8.h,
-              crossAxisSpacing: 8.w,
-              childAspectRatio: 1.6,
-            ),
-            itemBuilder: (context, index) {
-              final cat = categories[index];
-              return GestureDetector(
-                onTap: () {
-                  _searchController.text = cat.name;
-                  _onSearchChanged(cat.name);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        cat.color,
-                        cat.color.withValues(alpha: 0.7),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16.r),
-                  ),
-                  alignment: Alignment.bottomLeft,
-                  padding: EdgeInsets.all(12.w),
-                  child: Text(
-                    cat.name,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+            SizedBox(height: AppSpacing.space1),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.space5),
+              child: Text(
+                context.tr('search.bringInspiration'),
+                style: AppTypography.h2.copyWith(
+                  color: AppColors.textPrimaryDark,
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+            SizedBox(height: AppSpacing.space4),
+            SizedBox(
+              height: 240.h,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding:
+                    EdgeInsets.symmetric(horizontal: AppSpacing.space5),
+                itemCount: data.featuredBoards.length,
+                separatorBuilder: (_, __) =>
+                    SizedBox(width: AppSpacing.space4),
+                itemBuilder: (context, index) {
+                  return FeaturedBoardCard(
+                    board: data.featuredBoards[index],
+                    onTap: () =>
+                        onCategoryTap(data.featuredBoards[index].title),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: AppSpacing.space7),
+          ],
+
+          // Popular on Pinterest sections
+          for (final category in data.popularCategories) ...[
+            PopularCategorySection(
+              category: category,
+              onTap: () => onCategoryTap(category.title),
+            ),
+            SizedBox(height: AppSpacing.space7),
+          ],
+
+          SizedBox(height: AppSpacing.space10),
         ],
       ),
     );
   }
 }
 
-class _Category {
-  const _Category(this.name, this.color);
-  final String name;
-  final Color color;
+/// Shimmer loading state for the explore screen.
+class _ExploreShimmerLoading extends StatelessWidget {
+  const _ExploreShimmerLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
+      child: Shimmer.fromColors(
+        baseColor: AppColors.surfaceDark,
+        highlightColor: AppColors.surfaceVariantDark,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Hero placeholder
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.space2),
+              child: Container(
+                height: 360.h,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceDark,
+                  borderRadius: AppBorders.lg,
+                ),
+              ),
+            ),
+            SizedBox(height: AppSpacing.space7),
+            // Section title placeholder
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.space5),
+              child: Container(
+                height: 14.h,
+                width: 120.w,
+                color: AppColors.surfaceDark,
+              ),
+            ),
+            SizedBox(height: AppSpacing.space3),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.space5),
+              child: Container(
+                height: 24.h,
+                width: 250.w,
+                color: AppColors.surfaceDark,
+              ),
+            ),
+            SizedBox(height: AppSpacing.space4),
+            // Board cards placeholder
+            SizedBox(
+              height: 160.h,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                physics: const NeverScrollableScrollPhysics(),
+                padding:
+                    EdgeInsets.symmetric(horizontal: AppSpacing.space5),
+                itemCount: 3,
+                separatorBuilder: (_, __) =>
+                    SizedBox(width: AppSpacing.space4),
+                itemBuilder: (_, __) => Container(
+                  width: 200.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceDark,
+                    borderRadius: AppBorders.lg,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: AppSpacing.space7),
+            // Category placeholders
+            for (var i = 0; i < 3; i++) ...[
+              Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: AppSpacing.space5),
+                child: Container(
+                  height: 14.h,
+                  width: 100.w,
+                  color: AppColors.surfaceDark,
+                ),
+              ),
+              SizedBox(height: AppSpacing.space3),
+              Padding(
+                padding:
+                    EdgeInsets.symmetric(horizontal: AppSpacing.space5),
+                child: Container(
+                  height: 20.h,
+                  width: 180.w,
+                  color: AppColors.surfaceDark,
+                ),
+              ),
+              SizedBox(height: AppSpacing.space3),
+              SizedBox(
+                height: 130.h,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: AppSpacing.space5),
+                  itemCount: 4,
+                  separatorBuilder: (_, __) =>
+                      SizedBox(width: AppSpacing.space1),
+                  itemBuilder: (_, __) => Container(
+                    width: 130.w,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceDark,
+                      borderRadius: AppBorders.sm,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: AppSpacing.space7),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Error state for explore content.
+class _ExploreError extends StatelessWidget {
+  const _ExploreError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            context.tr('errors.somethingWentWrong'),
+            style: AppTypography.bodyLarge.copyWith(
+              color: AppColors.textSecondaryDark,
+            ),
+          ),
+          SizedBox(height: AppSpacing.space4),
+          TextButton(
+            onPressed: onRetry,
+            child: Text(
+              context.tr('general.retry'),
+              style: AppTypography.labelMedium.copyWith(
+                color: AppColors.pinterestRed,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -16,6 +16,8 @@ import 'package:pinterest/features/messages/presentation/views/messages_screen.d
 import 'package:pinterest/features/profile/presentation/views/profile_screen.dart';
 import 'package:pinterest/features/pin_detail/presentation/views/pin_detail_screen.dart';
 import 'package:pinterest/features/search/presentation/views/image_search_screen.dart';
+import 'package:pinterest/features/search/presentation/views/search_results_screen.dart';
+import 'package:pinterest/features/settings/presentation/views/account_screen.dart';
 import 'package:pinterest/router/route_names.dart';
 import 'package:pinterest/router/shell_scaffold.dart';
 
@@ -144,6 +146,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final photo = state.extra! as Photo;
           return ImageSearchScreen(photo: photo);
         },
+      ),
+
+      // Search results (pushed from search home)
+      GoRoute(
+        name: RouteNames.searchResults,
+        path: RoutePaths.searchResults,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final query = state.uri.queryParameters['q'] ?? '';
+          return SearchResultsScreen(initialQuery: query);
+        },
+      ),
+
+      // Account / Settings
+      GoRoute(
+        name: RouteNames.account,
+        path: RoutePaths.account,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const AccountScreen(),
       ),
     ],
   );

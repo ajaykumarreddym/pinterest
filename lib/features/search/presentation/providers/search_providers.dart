@@ -6,7 +6,9 @@ import 'package:pinterest/features/search/data/datasources/search_remote_datasou
 import 'package:pinterest/features/search/data/repositories/search_repository_impl.dart';
 import 'package:pinterest/features/search/domain/repositories/search_repository.dart';
 import 'package:pinterest/features/search/domain/usecases/search_photos_usecase.dart';
+import 'package:pinterest/features/search/presentation/providers/search_explore_notifier.dart';
 import 'package:pinterest/features/search/presentation/providers/search_notifier.dart';
+import 'package:pinterest/features/search/presentation/widgets/search_filter_bottom_sheet.dart';
 
 // Datasource
 final searchRemoteDatasourceProvider =
@@ -32,3 +34,13 @@ final searchPhotosProvider =
 
 // Current search query
 final searchQueryProvider = StateProvider<String>((ref) => '');
+
+// Current search filter type
+final searchFilterProvider =
+    StateProvider<SearchFilterType>((ref) => SearchFilterType.allPins);
+
+// Explore data (popular categories, taste cards, featured boards)
+final searchExploreProvider =
+    AsyncNotifierProvider<SearchExploreNotifier, SearchExploreData>(
+  SearchExploreNotifier.new,
+);

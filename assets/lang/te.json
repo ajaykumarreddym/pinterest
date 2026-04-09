@@ -106,7 +106,19 @@
     "searchForIdeas": "ఆలోచనలు వెతకండి",
     "ideasForYou": "మీ కోసం ఆలోచనలు",
     "moreToExplore": "ఇంకా చూడండి",
-    "noResultsFor": "ఫలితాలు లేవు"
+    "noResultsFor": "ఫలితాలు లేవు",
+    "popularOnPinterest": "Pinterest లో ప్రసిద్ధం",
+    "perYourTaste": "మీ అభిరుచి ప్రకారం",
+    "exploreFeaturedBoards": "ఫీచర్ చేసిన బోర్డులు చూడండి",
+    "bringInspiration": "మీ ప్రేరణను జీవం చేయండి",
+    "ideasForYouSection": "మీ కోసం ఆలోచనలు",
+    "filterBy": "ఫిల్టర్ చేయండి",
+    "allPins": "అన్ని పిన్‌లు",
+    "videos": "వీడియోలు",
+    "boards": "బోర్డులు",
+    "profiles": "ప్రొఫైల్‌లు",
+    "clearAll": "అన్నీ తొలగించు",
+    "pins": "పిన్‌లు"
   },
   "categories": {
     "wallpapers": "వాల్‌పేపర్లు",
@@ -141,6 +153,29 @@
   "create": {
     "title": "సృష్టించు",
     "subtitle": "పిన్ లేదా కొలాజ్ సృష్టించు"
+  },
+  "settings": {
+    "yourAccount": "మీ ఖాతా",
+    "settings": "సెట్టింగ్‌లు",
+    "accountManagement": "ఖాతా నిర్వహణ",
+    "profileVisibility": "ప్రొఫైల్ దృశ్యత",
+    "refineRecommendations": "మీ సిఫార్సులను మెరుగుపరచండి",
+    "claimedExternalAccounts": "క్లెయిమ్ చేసిన బాహ్య ఖాతాలు",
+    "socialPermissions": "సామాజిక అనుమతులు",
+    "notifications": "నోటిఫికేషన్‌లు",
+    "privacyAndData": "గోప్యత మరియు డేటా",
+    "reportsAndViolations": "నివేదికలు మరియు ఉల్లంఘన కేంద్రం",
+    "login": "లాగిన్",
+    "addAccount": "ఖాతా జోడించు",
+    "security": "భద్రత",
+    "logOut": "లాగ్ అవుట్",
+    "support": "సహాయం",
+    "helpCentre": "సహాయ కేంద్రం",
+    "termsOfService": "సేవా నిబంధనలు",
+    "privacyPolicy": "గోప్యత విధానం",
+    "about": "గురించి",
+    "viewProfile": "ప్రొఫైల్ చూడండి",
+    "shareProfile": "ప్రొఫైల్ షేర్ చేయండి"
   },
   "messages": {
     "title": "సందేశాలు",
