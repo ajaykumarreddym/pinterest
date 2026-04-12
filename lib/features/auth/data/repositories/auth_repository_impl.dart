@@ -57,7 +57,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, bool>> isAuthenticated() async {
     try {
-      final token = localDatasource.getAuthToken();
+      final token = await localDatasource.getAuthToken();
       return Right(token != null && token.isNotEmpty);
     } catch (e) {
       return const Right(false);

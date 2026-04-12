@@ -1,10 +1,11 @@
 import 'package:pinterest/core/constants/storage_keys.dart';
 import 'package:pinterest/core/services/storage/app_storage.dart';
+import 'package:pinterest/core/services/storage/secure_storage.dart';
 
 /// Local data source for caching auth state.
 abstract class AuthLocalDatasource {
   Future<void> cacheAuthToken(String token);
-  String? getAuthToken();
+  Future<String?> getAuthToken();
   Future<void> clearAuth();
   Future<void> clearAllUserData();
   Future<void> setOnboardingComplete();
@@ -12,32 +13,36 @@ abstract class AuthLocalDatasource {
 }
 
 class AuthLocalDatasourceImpl implements AuthLocalDatasource {
-  const AuthLocalDatasourceImpl({required this.storage});
+  const AuthLocalDatasourceImpl({
+    required this.storage,
+    required this.secureStorage,
+  });
 
   final AppStorage storage;
+  final SecureStorage secureStorage;
 
   @override
   Future<void> cacheAuthToken(String token) async {
-    await storage.setString(StorageKeys.authToken, token);
+    await secureStorage.write(StorageKeys.authToken, token);
   }
 
   @override
-  String? getAuthToken() {
-    return storage.getString(StorageKeys.authToken);
+  Future<String?> getAuthToken() async {
+    return secureStorage.read(StorageKeys.authToken);
   }
 
   @override
   Future<void> clearAuth() async {
-    await storage.remove(StorageKeys.authToken);
-    await storage.remove(StorageKeys.userId);
+    await secureStorage.delete(StorageKeys.authToken);
+    await secureStorage.delete(StorageKeys.userId);
   }
 
   @override
   Future<void> clearAllUserData() async {
-    // Auth
-    await storage.remove(StorageKeys.authToken);
-    await storage.remove(StorageKeys.refreshToken);
-    await storage.remove(StorageKeys.userId);
+    // Auth (secure storage)
+    await secureStorage.delete(StorageKeys.authToken);
+    await secureStorage.delete(StorageKeys.refreshToken);
+    await secureStorage.delete(StorageKeys.userId);
 
     // User profile
     await storage.remove(StorageKeys.userProfile);

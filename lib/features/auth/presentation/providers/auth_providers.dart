@@ -15,7 +15,10 @@ import 'package:pinterest/features/auth/domain/repositories/auth_repository.dart
 // ─── Datasources ────────────────────────────────────────────────
 
 final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
-  return AuthLocalDatasourceImpl(storage: ref.read(appStorageProvider));
+  return AuthLocalDatasourceImpl(
+    storage: ref.read(appStorageProvider),
+    secureStorage: ref.read(secureStorageProvider),
+  );
 });
 
 final userProfileDatasourceProvider = Provider<UserProfileDatasource>((ref) {
@@ -39,15 +42,27 @@ class AuthNotifier extends Notifier<AuthStatus> {
   @override
   AuthStatus build() {
     final local = ref.read(authLocalDatasourceProvider);
-    final token = local.getAuthToken();
     final onboarded = local.isOnboardingComplete();
 
+    // Check secure storage asynchronously, then update state.
+    _initAuthState();
+
     AppLogger.info(
-      '🔐 AuthNotifier.build — token: ${token != null}, onboarded: $onboarded',
+      '🔐 AuthNotifier.build — onboarded: $onboarded',
     );
 
-    if (token != null && token.isNotEmpty) return AuthStatus.authenticated;
-    return AuthStatus.unauthenticated;
+    // Default to unauthenticated, async check will update if needed.
+    return onboarded ? AuthStatus.authenticated : AuthStatus.unauthenticated;
+  }
+
+  Future<void> _initAuthState() async {
+    final local = ref.read(authLocalDatasourceProvider);
+    final token = await local.getAuthToken();
+    if (token != null && token.isNotEmpty) {
+      state = AuthStatus.authenticated;
+    } else {
+      state = AuthStatus.unauthenticated;
+    }
   }
 
   /// Whether the user has finished the onboarding screen.
@@ -391,23 +406,23 @@ class AuthNotifier extends Notifier<AuthStatus> {
 
   /// Sync Riverpod state with Clerk's auth state.
   /// Call this when the app resumes or ClerkAuthState notifies a change.
-  void syncWithClerk(BuildContext context) {
+  Future<void> syncWithClerk(BuildContext context) async {
     try {
       final clerkAuth = ClerkAuth.of(context, listen: false);
       if (clerkAuth.isSignedIn && state != AuthStatus.authenticated) {
         final local = ref.read(authLocalDatasourceProvider);
         final sessionToken = clerkAuth.session?.id ?? 'clerk_synced';
-        local.cacheAuthToken(sessionToken);
-        local.setOnboardingComplete();
+        await local.cacheAuthToken(sessionToken);
+        await local.setOnboardingComplete();
         state = AuthStatus.authenticated;
         _syncClerkUserToLocalProfile(clerkAuth);
         AppLogger.info('🔄 Synced: Clerk signed in → authenticated');
       } else if (!clerkAuth.isSignedIn && state == AuthStatus.authenticated) {
         // Check if it's a guest session — don't sign out guests
         final local = ref.read(authLocalDatasourceProvider);
-        final token = local.getAuthToken();
+        final token = await local.getAuthToken();
         if (token != null && !token.startsWith('guest_')) {
-          local.clearAuth();
+          await local.clearAuth();
           state = AuthStatus.unauthenticated;
           AppLogger.info('🔄 Synced: Clerk signed out → unauthenticated');
         }

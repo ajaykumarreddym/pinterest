@@ -18,10 +18,8 @@ class ApiClient {
     AppLogger.info('🔧 ApiClient initializing...');
     AppLogger.info('   Base URL: ${ApiConstants.pexelsV1}');
     AppLogger.info('   API Key present: ${apiKey.isNotEmpty}');
-    AppLogger.info('   API Key length: ${apiKey.length}');
-    if (apiKey.isNotEmpty) {
-      AppLogger.info('   API Key preview: ${apiKey.substring(0, apiKey.length.clamp(0, 8))}...');
-    } else {
+
+    if (apiKey.isEmpty) {
       AppLogger.error('⚠️ PEXELS_API_KEY is EMPTY! Check your .env file.');
     }
 

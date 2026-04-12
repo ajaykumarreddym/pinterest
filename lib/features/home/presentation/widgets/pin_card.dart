@@ -117,6 +117,7 @@ class _PinCardState extends ConsumerState<PinCard> {
     final aspectRatio = widget.photo.width / widget.photo.height;
     final cardWidth = (MediaQuery.sizeOf(context).width - 12.w) / 2;
     final cardHeight = cardWidth / aspectRatio;
+    final isSaved = ref.watch(isPinSavedProvider(widget.photo.id));
 
     return GestureDetector(
       onTap: () {
@@ -129,7 +130,7 @@ class _PinCardState extends ConsumerState<PinCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image
+          // Image with overlays
           Hero(
             tag: '${widget.heroTagPrefix}_${widget.photo.id}',
             child: ClipRRect(
@@ -160,6 +161,87 @@ class _PinCardState extends ConsumerState<PinCard> {
                       ),
                       fadeInDuration: const Duration(milliseconds: 200),
                     ),
+                    // Save button overlay — top right
+                    Positioned(
+                      top: 8.h,
+                      right: 8.w,
+                      child: GestureDetector(
+                        onTap: () async {
+                          final nowSaved = await ref
+                              .read(savedPinsProvider.notifier)
+                              .togglePin(widget.photo);
+                          if (mounted) {
+                            AppToast.success(
+                              context,
+                              message: nowSaved ? 'Pin saved' : 'Pin unsaved',
+                            );
+                          }
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 14.w,
+                            vertical: 6.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSaved
+                                ? AppColors.backgroundDark.withValues(alpha: 0.7)
+                                : AppColors.pinterestRed,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          child: Text(
+                            isSaved ? 'Saved' : 'Save',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Photographer overlay — bottom left
+                    if (widget.photo.photographer.isNotEmpty)
+                      Positioned(
+                        bottom: 8.h,
+                        left: 8.w,
+                        right: 36.w,
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 10.r,
+                              backgroundColor:
+                                  AppColors.surfaceVariantDark,
+                              child: Text(
+                                widget.photo.photographer[0].toUpperCase(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 9.sp,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 4.w),
+                            Flexible(
+                              child: Text(
+                                widget.photo.photographer,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11.sp,
+                                  fontWeight: FontWeight.w600,
+                                  shadows: const [
+                                    Shadow(
+                                      blurRadius: 4,
+                                      color: Colors.black,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),

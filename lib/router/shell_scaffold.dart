@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:pinterest/core/design_systems/colors/app_colors.dart';
+import 'package:pinterest/core/ui/atoms/offline_banner.dart';
 import 'package:pinterest/features/create/presentation/widgets/create_bottom_sheet.dart';
 import 'package:pinterest/features/home/presentation/providers/home_providers.dart';
 import 'package:pinterest/router/route_names.dart';
@@ -30,7 +32,12 @@ class ShellScaffold extends ConsumerWidget {
     final currentIndex = _calculateSelectedIndex(context);
 
     return Scaffold(
-      body: child,
+      body: Column(
+        children: [
+          const OfflineBanner(),
+          Expanded(child: child),
+        ],
+      ),
       bottomNavigationBar: _PinterestBottomNav(
         currentIndex: currentIndex,
         onTap: (index) => _onItemTapped(index, context, ref),
@@ -90,27 +97,27 @@ class _PinterestBottomNav extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NavItem(
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home,
+              _SvgNavItem(
+                asset: 'assets/icons/nav_home.svg',
+                activeAsset: 'assets/icons/nav_home_filled.svg',
                 isActive: currentIndex == 0,
                 onTap: () => onTap(0),
               ),
-              _NavItem(
-                icon: Icons.search,
-                activeIcon: Icons.search,
+              _SvgNavItem(
+                asset: 'assets/icons/nav_search.svg',
+                activeAsset: 'assets/icons/nav_search.svg',
                 isActive: currentIndex == 1,
                 onTap: () => onTap(1),
               ),
-              _NavItem(
-                icon: Icons.add,
-                activeIcon: Icons.add,
+              _SvgNavItem(
+                asset: 'assets/icons/nav_create.svg',
+                activeAsset: 'assets/icons/nav_create.svg',
                 isActive: currentIndex == 2,
                 onTap: () => onTap(2),
               ),
-              _NavItem(
-                icon: Icons.chat_bubble_outline,
-                activeIcon: Icons.chat_bubble,
+              _SvgNavItem(
+                asset: 'assets/icons/nav_message.svg',
+                activeAsset: 'assets/icons/nav_message_filled.svg',
                 isActive: currentIndex == 3,
                 onTap: () => onTap(3),
               ),
@@ -121,6 +128,48 @@ class _PinterestBottomNav extends StatelessWidget {
                 onTap: () => onTap(4),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SvgNavItem extends StatelessWidget {
+  const _SvgNavItem({
+    required this.asset,
+    required this.activeAsset,
+    required this.isActive,
+    required this.onTap,
+  });
+
+  final String asset;
+  final String activeAsset;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
+      behavior: HitTestBehavior.opaque,
+      child: SizedBox(
+        width: 56.w,
+        height: 50.h,
+        child: Center(
+          child: SvgPicture.asset(
+            isActive ? activeAsset : asset,
+            width: 26.sp,
+            height: 26.sp,
+            colorFilter: ColorFilter.mode(
+              isActive
+                  ? AppColors.bottomNavActive
+                  : AppColors.bottomNavInactive,
+              BlendMode.srcIn,
+            ),
           ),
         ),
       ),
